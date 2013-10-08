@@ -19,8 +19,8 @@ class Server:
 
     def run(self):
         log(("Listening on address %s:%s, connections will be forwarded " +
-               "to %s:%s") % (self.listen_host, self.listen_port,
-                              self.destination_host, self.destination_port))
+             "to %s:%s") % (self.listen_host, self.listen_port,
+                            self.destination_host, self.destination_port))
 
         self.s.listen(1)
         conn, addr = self.s.accept()
