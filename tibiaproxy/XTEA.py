@@ -28,7 +28,7 @@ class XTEA:
                       (sum + u(k[sum >> u(11) & u(3)]))
 
             ret += struct.pack("<I", v0) + struct.pack("<I", v1)
-        return NetworkMessage(ret)
+        return NetworkMessage(ret, True)
 
     @classmethod
     def decrypt(cls, msg, k):

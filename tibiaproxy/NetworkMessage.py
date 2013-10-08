@@ -3,8 +3,9 @@ import struct
 
 class NetworkMessage:
 
-    def __init__(self, buf):
-        self.buf = buf
+    def __init__(self, buf=None, writable=False):
+        self.writable = (buf is None or writable)
+        self.buf = buf or ""
         self.pos = 0
 
     def getByte(self):
@@ -37,4 +38,28 @@ class NetworkMessage:
         return self.buf[self.pos:]
 
     def getBuffer(self):
-        return self.buf
+        if not self.writable:
+            return self.buf
+        else:
+            return struct.pack("<H", len(self.buf)) + self.buf
+
+    def addByte(self, byte):
+        assert(self.writable)
+        self.buf += chr(byte)
+
+    def addU32(self, u32):
+        assert(self.writable)
+        self.buf += struct.pack("<I", u32)
+
+    def addU16(self, u16):
+        assert(self.writable)
+        self.buf += struct.pack("<H", u16)
+
+    def prependU16(self, u16):
+        assert(self.writable)
+        self.buf = struct.pack("<H", u16) + self.buf
+
+    def addString(self, _str):
+        assert(self.writable)
+        self.buf += struct.pack("<H", len(_str))
+        self.buf += _str

@@ -52,4 +52,18 @@ class LoginProtocol:
         return ret
 
     def prepareReply(self, login_reply):
-        return NetworkMessage("Hello, world")
+        ret = NetworkMessage()
+        ret.addByte(0x14)
+        ret.addString(login_reply.motd)
+        ret.addByte(0x64)
+        ret.addByte(len(login_reply.characters))
+        for char in login_reply.characters:
+            ret.addString(char.name)
+            ret.addString(char.world)
+            ret.addU32(ip_to_u32(char.ip))
+            ret.addU16(char.port)
+        # FIXME: This is probably wrong. See what's the right way and keep in
+        # mind that getBuffer makes the buffer temporarily larger.
+        ret.prependU16(len(ret.getBuffer()))
+        ret = XTEA.encrypt(ret, self.k)
+        return ret

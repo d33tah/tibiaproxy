@@ -42,18 +42,19 @@ class Server:
                             self.destination_host, self.destination_port))
 
         self.s.listen(1)
-        conn, addr = self.s.accept()
-        log("Received a connection from %s:%s" % addr)
-        data = conn.recv(1024)
-        msg = NetworkMessage(data)
+        while True:
+            conn, addr = self.s.accept()
+            log("Received a connection from %s:%s" % addr)
+            data = conn.recv(1024)
+            msg = NetworkMessage(data)
 
-        msg_size = msg.getU16()
-        assert(msg_size == len(data) - 2)
-        first_byte = msg.getByte()
-        if first_byte == 0x01:
-            self.handleLogin(conn, msg)
-        elif first_byte == 0x0A:
-            log("TODO: Will parse a game server packet.")
-        else:
-            log("ERROR: Unknown packet type %s" % hex(first_byte))
-            conn.close()
+            msg_size = msg.getU16()
+            assert(msg_size == len(data) - 2)
+            first_byte = msg.getByte()
+            if first_byte == 0x01:
+                self.handleLogin(conn, msg)
+            elif first_byte == 0x0A:
+                log("TODO: Will parse a game server packet.")
+            else:
+                log("ERROR: Unknown packet type %s" % hex(first_byte))
+                conn.close()
