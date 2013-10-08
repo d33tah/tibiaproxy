@@ -1,4 +1,5 @@
 import socket
+from NetworkMessage import NetworkMessage
 
 
 class Server:
@@ -22,3 +23,16 @@ class Server:
         self.s.listen(1)
         conn, addr = self.s.accept()
         print("Received a connection from %s:%s" % addr)
+        data = conn.recv(1024)
+        msg = NetworkMessage(data)
+
+        msg_size = msg.getU16()
+        assert(msg_size == len(data) - 2)
+        first_byte = msg.getByte()
+        if first_byte == 0x01:
+            print("TODO: Will parse a login packet.")
+        elif first_byte == 0x0A:
+            print("TODO: Will parse a game server packet.")
+        else:
+            print("ERROR: Unknown packet type %s" % hex(first_byte))
+            conn.close()
