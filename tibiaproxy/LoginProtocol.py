@@ -1,4 +1,5 @@
 from RSA import RSA
+from util import *
 
 
 class LoginProtocol:

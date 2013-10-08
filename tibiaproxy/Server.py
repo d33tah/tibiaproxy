@@ -1,6 +1,7 @@
 import socket
 from NetworkMessage import NetworkMessage
 from LoginProtocol import LoginProtocol
+from util import *
 
 
 class Server:
@@ -17,13 +18,13 @@ class Server:
         self.s.bind((self.listen_host, self.listen_port))
 
     def run(self):
-        print(("Listening on address %s:%s, connections will be forwarded " +
+        log(("Listening on address %s:%s, connections will be forwarded " +
                "to %s:%s") % (self.listen_host, self.listen_port,
                               self.destination_host, self.destination_port))
 
         self.s.listen(1)
         conn, addr = self.s.accept()
-        print("Received a connection from %s:%s" % addr)
+        log("Received a connection from %s:%s" % addr)
         data = conn.recv(1024)
         msg = NetworkMessage(data)
 
@@ -31,11 +32,11 @@ class Server:
         assert(msg_size == len(data) - 2)
         first_byte = msg.getByte()
         if first_byte == 0x01:
-            print("TODO: Will parse a login packet.")
+            log("TODO: Will parse a login packet.")
             proto = LoginProtocol(conn)
             proto.parseFirstMessage(msg)
         elif first_byte == 0x0A:
-            print("TODO: Will parse a game server packet.")
+            log("TODO: Will parse a game server packet.")
         else:
-            print("ERROR: Unknown packet type %s" % hex(first_byte))
+            log("ERROR: Unknown packet type %s" % hex(first_byte))
             conn.close()
