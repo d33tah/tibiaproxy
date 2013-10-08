@@ -27,3 +27,6 @@ class NetworkMessage:
         ret = self.buf[self.pos:self.pos+size]
         self.pos += size
         return ret
+
+    def skipBytes(self, _bytes):
+        self.pos += _bytes

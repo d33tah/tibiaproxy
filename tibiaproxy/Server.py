@@ -1,5 +1,6 @@
 import socket
 from NetworkMessage import NetworkMessage
+from LoginProtocol import LoginProtocol
 
 
 class Server:
@@ -31,6 +32,8 @@ class Server:
         first_byte = msg.getByte()
         if first_byte == 0x01:
             print("TODO: Will parse a login packet.")
+            proto = LoginProtocol(conn)
+            proto.parseFirstMessage(msg)
         elif first_byte == 0x0A:
             print("TODO: Will parse a game server packet.")
         else:
