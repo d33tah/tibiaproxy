@@ -1,2 +1,2 @@
 #!/bin/sh
-find -name '*.py' | xargs pep8
+find -name '*.py' | tee /dev/stderr | xargs pep8
