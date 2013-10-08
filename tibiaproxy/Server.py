@@ -26,9 +26,15 @@ class Server:
         log("Connecting to the destination host...")
         dest_s.connect((self.destination_host, self.destination_port))
         dest_s.send(msg.getBuffer())
+
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
-        proto.parseReply(msg)
+        reply = proto.parseReply(msg)
+        client_reply = copy.copy(reply)
+        for character in client_reply.characters:
+            character.ip = self.listen_host
+        client_reply_msg = proto.prepareReply(client_reply)
+        conn.send(client_reply_msg.getBuffer())
 
     def run(self):
         log(("Listening on address %s:%s, connections will be forwarded " +

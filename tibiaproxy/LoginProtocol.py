@@ -1,3 +1,4 @@
+from NetworkMessage import NetworkMessage
 from RSA import RSA
 from XTEA import XTEA
 from util import *
@@ -49,3 +50,6 @@ class LoginProtocol:
             ret.characters += [char]
 
         return ret
+
+    def prepareReply(self, login_reply):
+        return NetworkMessage("Hello, world")
