@@ -17,6 +17,17 @@ class Server:
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind((self.listen_host, self.listen_port))
 
+    def handleLogin(self, conn, msg):
+        proto = LoginProtocol(conn)
+        proto.parseFirstMessage(msg)
+        dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        log("Connecting to the destination host...")
+        dest_s.connect((self.destination_host, self.destination_port))
+        dest_s.send(msg.buf)
+        data = dest_s.recv(1024)
+        msg = NetworkMessage(data)
+        proto.parseReply(msg)
+
     def run(self):
         log(("Listening on address %s:%s, connections will be forwarded " +
              "to %s:%s") % (self.listen_host, self.listen_port,
@@ -32,9 +43,7 @@ class Server:
         assert(msg_size == len(data) - 2)
         first_byte = msg.getByte()
         if first_byte == 0x01:
-            log("TODO: Will parse a login packet.")
-            proto = LoginProtocol(conn)
-            proto.parseFirstMessage(msg)
+            self.handleLogin(conn, msg)
         elif first_byte == 0x0A:
             log("TODO: Will parse a game server packet.")
         else:
