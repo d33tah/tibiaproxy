@@ -12,7 +12,7 @@ class XTEA:
 
     @classmethod
     def encrypt(cls, msg, k):
-        buf = msg.buf[msg.pos:]
+        buf = msg.getRest()
         ret = ""
         for offset in range(len(buf)/8):
             v0 = u(struct.unpack("<I", buf[offset*8:offset*8+4]))
@@ -32,7 +32,7 @@ class XTEA:
 
     @classmethod
     def decrypt(cls, msg, k):
-        buf = msg.buf[msg.pos:]
+        buf = msg.getRest()
         ret = ""
         for offset in range(len(buf)/8):
             v0 = u(struct.unpack("<I", buf[offset*8:offset*8+4]))

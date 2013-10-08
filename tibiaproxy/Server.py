@@ -23,7 +23,7 @@ class Server:
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         log("Connecting to the destination host...")
         dest_s.connect((self.destination_host, self.destination_port))
-        dest_s.send(msg.buf)
+        dest_s.send(msg.getBuffer())
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
         proto.parseReply(msg)
