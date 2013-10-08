@@ -1,7 +1,9 @@
-import socket
 from NetworkMessage import NetworkMessage
 from LoginProtocol import LoginProtocol
 from util import *
+
+import socket
+import copy
 
 
 class Server:
