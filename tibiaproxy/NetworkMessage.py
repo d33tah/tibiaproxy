@@ -50,7 +50,6 @@ class NetworkMessage:
     def skipBytes(self, _bytes):
         ret = self.buf[self.pos:self.pos+_bytes]
         self.pos += _bytes
-        return ret
 
     def getRest(self):
         return self.buf[self.pos:]
