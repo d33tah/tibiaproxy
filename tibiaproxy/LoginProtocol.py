@@ -49,7 +49,8 @@ class LoginProtocol:
         Args:
             msg (NetworkMessage): the network message to be parsed.
 
-        Returns None"""
+        Returns None
+        """
         msg.skipBytes(16)
         msg = RSA.decrypt(msg)
         # Extract the XTEA keys from the RSA-decrypted message.
@@ -61,7 +62,8 @@ class LoginProtocol:
         Args:
             msg (NetworkMessage): the network message to be parsed.
 
-        Returns LoginReply"""
+        Returns LoginReply
+        """
         ret = LoginReply()
 
         size = msg.getU16()
@@ -93,7 +95,8 @@ class LoginProtocol:
             login_reply (LoginReply): the login_reply structure used to build
                 the response.
 
-        Returns NetworkMessage"""
+        Returns NetworkMessage
+        """
 
         ret = NetworkMessage()
         ret.addByte(0x14)
