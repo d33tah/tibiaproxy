@@ -60,7 +60,7 @@ class LoginProtocol:
             char = LoginCharacterEntry()
             char.name = msg.getString()
             char.world = msg.getString()
-            char.ip = msg.getU32()
+            char.ip = u32_to_ip(msg.getU32())
             char.port = msg.getU16()
             ret.characters += [char]
 

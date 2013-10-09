@@ -25,6 +25,8 @@ def log(_str):
     sys.stderr.write(_str + "\n")
     sys.stderr.flush()
 
+def u32_to_ip(ip):
+    return socket.inet_ntoa(struct.pack("<I", ip))
 
 def ip_to_u32(ip):
     return struct.unpack("<I", socket.inet_aton(ip))[0]
