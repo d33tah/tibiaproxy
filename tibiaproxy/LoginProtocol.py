@@ -1,4 +1,8 @@
 """
+LoginProtocol.py - contains classes needed to handle the login protocol.
+"""
+
+"""
 This file is part of tibiaproxy.
 
 tibiaproxy is free software; you can redistribute it and/or modify
@@ -23,6 +27,7 @@ from util import *
 
 
 class LoginCharacterEntry:
+    """Describes a single character list item from the login protocol."""
     name = ""
     world = ""
     ip = 0
@@ -30,18 +35,33 @@ class LoginCharacterEntry:
 
 
 class LoginReply:
+    """Describes a login protocol reply."""
     motd = ""
     characters = []
 
 
 class LoginProtocol:
+    """Handles building and parsing the login protocol network messages."""
 
     def parseFirstMessage(self, msg):
+        """Parse the first (client's) message from the login protocol.
+
+        Args:
+            msg (NetworkMessage): the network message to be parsed.
+
+        Returns None"""
         msg.skipBytes(16)
         msg = RSA.decrypt(msg)
+        # Extract the XTEA keys from the RSA-decrypted message.
         self.k = [msg.getU32() for i in range(4)]
 
     def parseReply(self, msg):
+        """Parse the reply from the login server.
+
+        Args:
+            msg (NetworkMessage): the network message to be parsed.
+
+        Returns LoginReply"""
         ret = LoginReply()
 
         size = msg.getU16()
@@ -67,6 +87,14 @@ class LoginProtocol:
         return ret
 
     def prepareReply(self, login_reply):
+        """Prepare the reply based on a LoginReply instance.
+
+        Args:
+            login_reply (LoginReply): the login_reply structure used to build
+                the response.
+
+        Returns NetworkMessage"""
+
         ret = NetworkMessage()
         ret.addByte(0x14)
         ret.addString(login_reply.motd)
