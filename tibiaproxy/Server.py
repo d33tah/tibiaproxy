@@ -51,6 +51,7 @@ class Server:
         client_reply = copy.copy(reply)
         for character in client_reply.characters:
             character.ip = self.listen_host
+            character.port = self.listen_port
         client_reply_msg = proto.prepareReply(client_reply)
         conn.send(client_reply_msg.getBuffer())
 
