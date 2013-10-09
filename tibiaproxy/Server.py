@@ -38,7 +38,7 @@ class Server:
         self.s.bind((self.listen_host, self.listen_port))
 
     def handleLogin(self, conn, msg):
-        proto = LoginProtocol(conn)
+        proto = LoginProtocol()
         proto.parseFirstMessage(msg)
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         log("Connecting to the destination host...")
