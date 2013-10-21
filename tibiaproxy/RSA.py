@@ -51,7 +51,7 @@ class RSA:
 
     @classmethod
     def decrypt(cls, msg):
-        c_bin = msg.getRest()
+        c_bin = msg.getRest()[:128]
         c_hex = ''.join([byte_to_hex(i) for i in c_bin])
 
         c = int(c_hex, 16)
