@@ -28,11 +28,13 @@ import copy
 class Server:
 
     def __init__(self, destination_host, destination_port,
-                 listen_host, listen_port):
+                 listen_host, listen_port, announce_host, announce_port):
         self.destination_host = destination_host
         self.destination_port = int(destination_port)
         self.listen_host = listen_host
         self.listen_port = int(listen_port)
+        self.announce_host = announce_host
+        self.announce_port = int(announce_port)
 
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -51,8 +53,8 @@ class Server:
         reply = proto.parseReply(msg, xtea_key)
         client_reply = copy.copy(reply)
         for character in client_reply.characters:
-            character.ip = self.listen_host
-            character.port = self.listen_port
+            character.ip = self.announce_host
+            character.port = self.announce_port
         client_reply_msg = proto.prepareReply(client_reply, xtea_key)
         conn.send(client_reply_msg.getBuffer())
         conn.close()
