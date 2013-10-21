@@ -57,7 +57,7 @@ class LoginProtocol:
         # Extract the XTEA keys from the RSA-decrypted message.
         return [msg.getU32() for i in range(4)]
 
-    def parseReply(self, msg):
+    def parseReply(self, msg, xtea_key):
         """Parse the reply from the login server.
 
         Args:
@@ -68,7 +68,7 @@ class LoginProtocol:
         ret = LoginReply()
 
         size = msg.getU16()
-        msg = XTEA.decrypt(msg, self.k)
+        msg = XTEA.decrypt(msg, xtea_key)
         assert(len(msg.getBuffer()) == size)
         decrypted_size = msg.getU16()
         assert(decrypted_size == size - 5)
@@ -89,7 +89,7 @@ class LoginProtocol:
 
         return ret
 
-    def prepareReply(self, login_reply):
+    def prepareReply(self, login_reply, xtea_key):
         """Prepare the reply based on a LoginReply instance.
 
         Args:
@@ -112,5 +112,5 @@ class LoginProtocol:
         # FIXME: This is probably wrong. See what's the right way and keep in
         # mind that getBuffer makes the buffer temporarily larger.
         ret.prependU16(len(ret.getBuffer()))
-        ret = XTEA.encrypt(ret, self.k)
+        ret = XTEA.encrypt(ret, xtea_key)
         return ret

@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 from NetworkMessage import NetworkMessage
 from LoginProtocol import LoginProtocol
+from XTEA import XTEA
 from util import *
 
 import socket
@@ -39,7 +40,7 @@ class Server:
 
     def handleLogin(self, conn, msg):
         proto = LoginProtocol()
-        proto.parseFirstMessage(msg)
+        xtea_key = proto.parseFirstMessage(msg)
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         log("Connecting to the destination host...")
         dest_s.connect((self.destination_host, self.destination_port))
@@ -47,12 +48,12 @@ class Server:
 
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
-        reply = proto.parseReply(msg)
+        reply = proto.parseReply(msg, xtea_key)
         client_reply = copy.copy(reply)
         for character in client_reply.characters:
             character.ip = self.listen_host
             character.port = self.listen_port
-        client_reply_msg = proto.prepareReply(client_reply)
+        client_reply_msg = proto.prepareReply(client_reply, xtea_key)
         conn.send(client_reply_msg.getBuffer())
 
     def run(self):
