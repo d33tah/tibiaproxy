@@ -55,6 +55,7 @@ class Server:
             character.port = self.listen_port
         client_reply_msg = proto.prepareReply(client_reply, xtea_key)
         conn.send(client_reply_msg.getBuffer())
+        conn.close()
 
     def run(self):
         log(("Listening on address %s:%s, connections will be forwarded " +
