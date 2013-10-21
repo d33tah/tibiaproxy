@@ -21,6 +21,7 @@ from LoginProtocol import LoginProtocol
 from XTEA import XTEA
 from util import *
 
+import select
 import socket
 import copy
 
@@ -59,6 +60,29 @@ class Server:
         conn.send(client_reply_msg.getBuffer())
         conn.close()
 
+    def handleGame(self, conn, data):
+        dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        log("Connecting to the hardcoded game server...")
+        dest_s.connect((self.destination_host, self.destination_port))
+        msg = NetworkMessage(data)
+        xtea_key = LoginProtocol().parseFirstMessage(msg, 7)
+        dest_s.send(data)
+        dest_s.setblocking(0)
+        conn.setblocking(0)
+        while True:
+            has_data, _, _ = select.select([conn, dest_s], [], [])
+            if conn in has_data:
+                data = conn.recv(1024)
+                msg = NetworkMessage(data)
+                msg_size = msg.getU16()
+                assert(msg_size == len(data) - 2)
+                msg = XTEA.decrypt(msg, xtea_key)
+                print("msg_type = %s, buf=%s" % (msg.getByte(), msg.getRest()))
+                dest_s.send(data)
+            if dest_s in has_data:
+                data = dest_s.recv(1024)
+                conn.send(data)
+
     def run(self):
         log(("Listening on address %s:%s, connections will be forwarded " +
              "to %s:%s") % (self.listen_host, self.listen_port,
@@ -77,7 +101,7 @@ class Server:
             if first_byte == 0x01:
                 self.handleLogin(conn, msg)
             elif first_byte == 0x0A:
-                log("TODO: Will parse a game server packet.")
+                self.handleGame(conn, data)
             else:
                 log("ERROR: Unknown packet type %s" % hex(first_byte))
                 conn.close()
