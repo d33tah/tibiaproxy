@@ -32,6 +32,7 @@ class LoginCharacterEntry:
     world = ""
     ip = 0
     port = 0
+    keys = []
 
 
 class LoginReply:
@@ -43,18 +44,18 @@ class LoginReply:
 class LoginProtocol:
     """Handles building and parsing the login protocol network messages."""
 
-    def parseFirstMessage(self, msg):
+    def parseFirstMessage(self, msg, skip_bytes=16):
         """Parse the first (client's) message from the login protocol.
 
         Args:
             msg (NetworkMessage): the network message to be parsed.
 
-        Returns None
+        Returns list
         """
-        msg.skipBytes(16)
+        msg.skipBytes(skip_bytes)
         msg = RSA.decrypt(msg)
         # Extract the XTEA keys from the RSA-decrypted message.
-        self.k = [msg.getU32() for i in range(4)]
+        return [msg.getU32() for i in range(4)]
 
     def parseReply(self, msg):
         """Parse the reply from the login server.
