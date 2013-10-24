@@ -33,6 +33,7 @@ def log(_str):
     sys.stderr.write(_str + "\n")
     sys.stderr.flush()
 
+
 def u32_to_ip(ip):
     """Converts an OpenTibia U32 number to an IP address.
 
@@ -42,6 +43,7 @@ def u32_to_ip(ip):
     Returns str
     """
     return socket.inet_ntoa(struct.pack("<I", ip))
+
 
 def ip_to_u32(ip):
     """Converts an IP address to an OpenTibia U32 number.

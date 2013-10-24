@@ -150,7 +150,7 @@ class Server:
                     sendmsg.prependU16(len(sendmsg.getBuffer()) - 2)
                     # Add some padding bytes.
                     for i in range(8 - (len(sendmsg.getBuffer()) % 8)):
-                      sendmsg.addByte(0x33)
+                        sendmsg.addByte(0x33)
                     sendmsg = XTEA.encrypt(sendmsg, xtea_key)
                     conn.send(sendmsg.getBuffer())
                 else:
