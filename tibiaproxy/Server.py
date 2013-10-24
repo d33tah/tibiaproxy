@@ -142,7 +142,10 @@ class Server:
                     msg.skipBytes(1)
                     player_said = msg.getString()
                     print("Player said %s!" % player_said)
-                    to_send = str(eval(player_said))
+                    try:
+                        to_send = str(eval(player_said))
+                    except Exception, e:
+                        to_send = str(e)
                     sendmsg = NetworkMessage()
                     sendmsg.addByte(0xB4)  # send text message
                     sendmsg.addByte(0x1A)  # console, orange text
