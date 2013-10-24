@@ -49,6 +49,7 @@ class LoginProtocol:
 
         Args:
             msg (NetworkMessage): the network message to be parsed.
+            skip_bytes (int): the offset at which is the RSA-encrypted message.
 
         Returns list
         """
