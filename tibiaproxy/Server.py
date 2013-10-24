@@ -77,8 +77,24 @@ class Server:
                 msg_size = msg.getU16()
                 assert(msg_size == len(data) - 2)
                 msg = XTEA.decrypt(msg, xtea_key)
-                print("msg_type = %s, buf=%s" % (msg.getByte(), msg.getRest()))
-                dest_s.send(data)
+                msg.getU16()
+                packet_type = msg.getByte()
+                if packet_type == 150:
+                    msg.skipBytes(1)
+                    player_said = msg.getString()
+                    print("Player said %s!" % player_said)
+                    to_send = str(eval(player_said))
+                    sendmsg = NetworkMessage()
+                    sendmsg.addByte(0xB4)  # send text message
+                    sendmsg.addByte(0x1A)  # console, orange text
+                    sendmsg.addString(to_send)
+                    sendmsg.prependU16(len(sendmsg.getBuffer()) - 2)
+                    for i in range(8 - (len(sendmsg.getBuffer()) % 8)):
+                      sendmsg.addByte(0x33)
+                    sendmsg = XTEA.encrypt(sendmsg, xtea_key)
+                    conn.send(sendmsg.getBuffer())
+                else:
+                    dest_s.send(data)
             if dest_s in has_data:
                 data = dest_s.recv(1024)
                 conn.send(data)
