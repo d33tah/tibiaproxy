@@ -20,8 +20,17 @@ from NetworkMessage import NetworkMessage
 
 
 def toint(x):
+    """Convert a string represented as an integer to an integer, removing all
+    newline characters.
+
+    Args:
+        x (str): the string to be converted
+
+    Returns int
+    """
     return int(x.replace('\n', ''))
 
+#OpenTibia keys
 p = toint("""
 142996239624163995200701773828988955507954033454661532174705160829347375827760
 38882967213386204600674145392845853859217990626450972452084065728686565928113
@@ -41,6 +50,13 @@ d = toint("""
 
 
 def byte_to_hex(i):
+    """Convert a character to the hexadecimal form, padding it with spaces.
+
+    Args:
+        i (str): the character to be converted
+
+    Returns str
+    """
     without_0x = hex(ord(i)).replace('0x', '')
     space_padded = "%2s" % without_0x
     zero_padded = space_padded.replace(' ', '0')
@@ -48,21 +64,31 @@ def byte_to_hex(i):
 
 
 class RSA:
+    """Handles RSA operations."""
 
     @classmethod
     def decrypt(cls, msg):
+        """Decrypts an RSA-encrypted message with an OpenTibia key.
+
+        Args:
+            msg (str): the message to be decrypted
+
+        Returns NetworkMessage
+        """
         c_bin = msg.getRest()[:128]
         c_hex = ''.join([byte_to_hex(i) for i in c_bin])
 
         c = int(c_hex, 16)
 
         n = p*q
+        # z = c^d % n, way faster than z = c**d % n
         z = pow(c, d, n)
 
         z_hex = "%x" % z
         if len(z_hex) % 2 != 0:
             z_hex = "0" + z_hex
 
+        # Now, convert the hexadecimal form to a binary one.
         z_bin = ""
         for i in range(len(z_hex)/2):
             chunk = z_hex[i*2:(i+1)*2]

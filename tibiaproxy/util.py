@@ -22,11 +22,33 @@ import struct
 
 
 def log(_str):
+    """Poor man's log function. Prints the argument to the standard error
+    output, with a newline added. Then, it flushes it just-in-case.
+
+    Args:
+        _str (str): the message to be printed
+
+    Returns None
+    """
     sys.stderr.write(_str + "\n")
     sys.stderr.flush()
 
 def u32_to_ip(ip):
+    """Converts an OpenTibia U32 number to an IP address.
+
+    Args:
+        ip (int): the OpenTibia U32 number to be translated into an IP address.
+
+    Returns str
+    """
     return socket.inet_ntoa(struct.pack("<I", ip))
 
 def ip_to_u32(ip):
+    """Converts an IP address to an OpenTibia U32 number.
+
+    Args:
+        ip (str): the IP address to be translated into an OpenTibia U32 number.
+
+    Returns int
+    """
     return struct.unpack("<I", socket.inet_aton(ip))[0]

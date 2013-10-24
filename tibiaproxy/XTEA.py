@@ -27,9 +27,18 @@ u = numpy.uint32
 
 
 class XTEA:
+    """Handles XTEA messages encryption/decryption."""
 
     @classmethod
     def encrypt(cls, msg, k):
+        """Encrypts a given message using the given key.
+
+        Args:
+            msg (NetworkMessage): the network message pointed to encrypted data
+            k (list): XTEA key - a list of four OpenTibia U32 integers
+
+        Returns NetworkMessage
+        """
         buf = msg.getRest()
         ret = ""
         for offset in range(len(buf)/8):
@@ -50,6 +59,14 @@ class XTEA:
 
     @classmethod
     def decrypt(cls, msg, k):
+        """Decrypts a given message using the given key.
+
+        Args:
+            msg (NetworkMessage): the network message pointed to decrypted data
+            k (list): XTEA key - a list of four OpenTibia U32 integers
+
+        Returns NetworkMessage
+        """
         buf = msg.getRest()
         ret = ""
         for offset in range(len(buf)/8):
