@@ -5,6 +5,11 @@ Tibia proxy is a proof of concept proxy for OpenTibia servers with protocol
 version 8.20. Its goal is to provide you with a server you could run on a
 trusted host that you could connect to, tunneling your Tibia session.
 
+Currently its login server code is very buggy, but it relays the game server
+packets correctly. It can decode "say" command and - as a proof of concept -
+it evaluates whatever the user tried to say and instead of passing it to the
+game server, sends it the result of the evaluation.
+
 WARNING
 =======
 
@@ -42,7 +47,8 @@ try to log in using your target server's account name and password.
 How does it work?
 =================
 
-Short answer: basically, it doesn't, at least not yet (see "Bugs, problems").
+Short answer: basically, it hardly does at the moment (see "Bugs, problems").
+It's currently mostly for demonstration purposes.
 
 Long answer: once launched, the proxy opens a TCP port, listening for Tibia
 login connections. When a Tibia client tries to log in, the proxy attempts to
@@ -51,9 +57,14 @@ and forwards the message to the target server. Then, its reply is being sent
 back to the user, with the server IPs changed so that the next connection will
 also be sent by proxy.
 
-Then, the plan is to receive game session connections as well and proxy them
-according to data saved in the program. Packets will be decrypted and if any
-of them hits a pre-programmed event, action will be taken.
+Then, when a player requests a game server connection, an enormous kludge
+begins - in the current version, a connection is made to the login server (in
+hope that it also serves game server connections - sometimes it's not true)
+and the original packet is simply forwarded (we read the XTEA key, though).
+Then, all the communication between the player, the proxy and the game server
+is relayed so that the proxy feels invisible - with the exception that an
+attempt to say anything will result in printing the effect of evaluating the
+message as Python code instead of sending it over to the server.
 
 Bugs, problems
 ==============
