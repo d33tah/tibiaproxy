@@ -14,12 +14,13 @@ WARNING
 =======
 
 In case of MMORPG hacks, detection is way simpler than you might think. While
-using this application, keep in mind that you get banned from playing the game,
-perhaps even on a per-IP basis. Should this happen, I am IN NO WAY RESPONSIBLE.
+using this application, keep in mind that you get banned from playing the
+game, perhaps even on a per-IP basis. Should this happen, I am IN NO WAY
+RESPONSIBLE.
 
 Also, keep in mind that the account name and password is being sent to the
-proxy in a basically **UNENCRYPTED** form - it is using the OpenTibia keys, for
-which the private key is known. This means that anyone able to sniff the
+proxy in a basically **UNENCRYPTED** form - it is using the OpenTibia keys,
+for which the private key is known. This means that anyone able to sniff the
 connection between you and your proxy will be able to see what is your account
 name and passwordwhich is a problem if the proxy is not in your local network.
 
@@ -37,8 +38,8 @@ your operating system documentation and or type in "easy_install" in your web
 search engine.
 
 Once you have installed Python, you need to modify config.py. Please read and
-follow theinstructions embedded in the file to understand what are the meanings
-of the configuration options.
+follow theinstructions embedded in the file to understand what are the
+meanings of the configuration options.
 
 After configuration, you're free to run main.py. Use any OpenTibia IP changer
 to point your Tibia client to the host and IP specified in the config.py and
@@ -88,8 +89,8 @@ This application was written by Jacek Wielemborek <d33tah@gmail.com>. My blog
 can be found here:
 [http://deetah.jogger.pl/kategoria/english/](http://deetah.jogger.pl/kategoria/english/)
 
-If you're not a viagra vendor, feel free to write me an e-mail, I'd be happy to
-hear that you use this program!
+If you're not a viagra vendor, feel free to write me an e-mail, I'd be happy
+to hear that you use this program!
 
 This program is Free Software and is protected by GNU General Public License
 version 3. Basically, it gives you four freedoms:
