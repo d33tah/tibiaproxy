@@ -31,15 +31,10 @@ to try SSH tunneling to add another layer of encryption.
 Usage
 =====
 
-To be able to run the program, you need Python installed on your system. You
-might also need to install numpy - since the installation procedures vary
-depending on your operating system and I'm too lazy to test it, please consult
-your operating system documentation and or type in "easy_install" in your web
-search engine.
-
-Once you have installed Python, you need to modify config.py. Please read and
-follow theinstructions embedded in the file to understand what are the
-meanings of the configuration options.
+To be able to run the program, you need Python installed on your system. Once
+you have installed it, you need to modify config.py. Please read and follow
+the instructions embedded in the file to understand what are the meanings
+of the configuration options.
 
 After configuration, you're free to run main.py. Use any OpenTibia IP changer
 to point your Tibia client to the host and IP specified in the config.py and
