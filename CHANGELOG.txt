@@ -1,0 +1,11 @@
+The following is a log of changes for the tibiaproxy project.
+
+1.1
+
+* Removed NumPy as the dependency.
+
+1.0
+
+* initial support for 8.20 protocol
+* experimental login and game server relaying code
+* proof-of-concept "on say" callback functionality
