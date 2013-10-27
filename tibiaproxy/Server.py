@@ -24,6 +24,9 @@ from util import *
 import select
 import socket
 import copy
+import time
+import threading
+import sys
 
 
 class Server:
@@ -31,20 +34,28 @@ class Server:
     the server."""
 
     def __init__(self, destination_host, destination_port,
-                 listen_host, listen_port, announce_host, announce_port):
+                 listen_login_host, listen_login_port,
+                 listen_game_host, listen_game_port,
+                 announce_host, announce_port):
         self.destination_host = destination_host
         self.destination_port = int(destination_port)
-        self.listen_host = listen_host
-        self.listen_port = int(listen_port)
+        self.listen_login_host = listen_login_host
+        self.listen_login_port = int(listen_login_port)
+        self.listen_game_host = listen_game_host
+        self.listen_game_port = int(listen_game_port)
         self.announce_host = announce_host
         self.announce_port = int(announce_port)
 
         # Try to request the TCP port from the operating system. Tell it that
         # it is going to be a reusable port, so that a sudden crash of the
         # program is not going to block the port forever for other processes.
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.s.bind((self.listen_host, self.listen_port))
+        self.l_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.l_s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.l_s.bind((self.listen_login_host, self.listen_login_port))
+
+        self.g_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.g_s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.g_s.bind((self.listen_game_host, self.listen_game_port))
 
     def handleLogin(self, conn, msg):
         """Handles the login communication, passing it to the destination host,
@@ -156,38 +167,68 @@ class Server:
                         sendmsg.addByte(0x33)
                     sendmsg = XTEA.encrypt(sendmsg, xtea_key)
                     conn.send(sendmsg.getBuffer())
-                else:
-                    # Otherwise, just pass the packet to the server.
-                    dest_s.send(data)
+                # Otherwise, just pass the packet to the server.
+                dest_s.send(data)
             if dest_s in has_data:
                 # Server sent us some data. Currently, no parsing is done -
                 # just pass it to the player.
                 data = dest_s.recv(1024)
                 conn.send(data)
 
-    def run(self):
-        """Enter the proxy main loop.
+    def serveLogin(self):
+        """Listen for login server connections and handle them.
 
         Returns None
         """
-        log(("Listening on address %s:%s, connections will be forwarded " +
-             "to %s:%s") % (self.listen_host, self.listen_port,
-                            self.destination_host, self.destination_port))
-
-        self.s.listen(1)
-        while True:
-            conn, addr = self.s.accept()
-            log("Received a connection from %s:%s" % addr)
+        while self.running:
+            conn, addr = self.l_s.accept()
+            log("Received a login connection from %s:%s" % addr)
             data = conn.recv(1024)
             msg = NetworkMessage(data)
+            self.handleLogin(conn, msg)
 
-            msg_size = msg.getU16()
-            assert(msg_size == len(data) - 2)
-            first_byte = msg.getByte()
-            if first_byte == 0x01:
-                self.handleLogin(conn, msg)
-            elif first_byte == 0x0A:
-                self.handleGame(conn, data)
-            else:
-                log("ERROR: Unknown packet type %s" % hex(first_byte))
-                conn.close()
+    def serveGame(self):
+        """Listen for game server connections and handle them.
+
+        Returns None
+        """
+        while self.running:
+            conn, addr = self.g_s.accept()
+            log("Received a game server connection from %s:%s" % addr)
+            data = conn.recv(1024)
+            msg = NetworkMessage(data)
+            self.handleGame(conn, data)
+
+    def run(self):
+        """Run serveLogin and serveGame threads and wait for them to die.
+
+        Returns None
+        """
+        log(("Listening on address %s:%s (login), %s:%s (game), connections " +
+             "will be forwarded to %s:%s") % (self.listen_login_host,
+                                              self.listen_login_port,
+                                              self.listen_game_host,
+                                              self.listen_game_port,
+                                              self.destination_host,
+                                              self.destination_port))
+
+        self.l_s.listen(1)
+        self.g_s.listen(1)
+
+        self.running = True
+
+        t_l = threading.Thread(target=self.serveLogin)
+        g_l = threading.Thread(target=self.serveGame)
+
+        t_l.daemon = True
+        g_l.daemon = True
+
+        t_l.start()
+        g_l.start()
+
+        # http://stackoverflow.com/q/3788208/1091116
+        try:
+            while True:
+                time.sleep(100)
+        except (KeyboardInterrupt, SystemExit):
+            sys.exit("Received keyboard interrupt, quitting")

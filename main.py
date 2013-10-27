@@ -24,8 +24,10 @@ from tibiaproxy.Server import Server
 if __name__ == '__main__':
     s = Server(destination_host=config.destination_host,
                destination_port=config.destination_port,
-               listen_host=config.listen_host,
-               listen_port=config.listen_port,
+               listen_login_host=config.listen_login_host,
+               listen_login_port=config.listen_login_port,
+               listen_game_host=config.listen_game_host,
+               listen_game_port=config.listen_game_port,
                announce_host=config.announce_host,
                announce_port=config.announce_port)
     s.run()
