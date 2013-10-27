@@ -44,7 +44,7 @@ class LoginReply:
 class LoginProtocol:
     """Handles building and parsing the login protocol network messages."""
 
-    def parseFirstMessage(self, msg, skip_bytes=16):
+    def parseFirstMessage(self, msg, skip_bytes=28):
         """Parse the first (client's) message from the login protocol.
 
         Args:
