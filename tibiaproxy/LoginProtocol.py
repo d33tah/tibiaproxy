@@ -71,7 +71,7 @@ class LoginProtocol:
         size = msg.getU16()
 
         # someday perhaps I'll have enough time to even check the checksums!
-        checksum = msg.getU32()
+        msg.skipBytes(4)
 
         msg = XTEA.decrypt(msg, xtea_key)
         assert(len(msg.getBuffer()) == size)
