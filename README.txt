@@ -1,5 +1,5 @@
-tibiaproxy v1.1
-===============
+tibiaproxy v2.0-git
+===================
 
 Tibia proxy is a proof of concept proxy for OpenTibia servers with protocol
 version 8.20. Its goal is to provide you with a server you could run on a

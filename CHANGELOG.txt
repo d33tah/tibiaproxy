@@ -1,6 +1,6 @@
 The following is a log of changes for the tibiaproxy project.
 
-Git
+2.0-git
 
 * Changed the default listen port from 7172 to 7172 and the default target port
   from 7172 to 7171.
