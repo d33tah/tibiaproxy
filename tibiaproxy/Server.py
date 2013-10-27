@@ -200,7 +200,7 @@ class Server:
             self.handleGame(conn, data)
 
     def run(self):
-        """Run serveLogin and serveGame threads and wait for them to die.
+        """Run serveLogin and serveGame threads and sleep forever.
 
         Returns None
         """
