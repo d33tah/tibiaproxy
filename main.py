@@ -22,7 +22,10 @@ import config
 from tibiaproxy.Server import Server
 
 if __name__ == '__main__':
-    s = Server(config.destination_host, config.destination_port,
-               config.listen_host, config.listen_port, config.announce_host,
-               config.announce_port)
+    s = Server(destination_host=config.destination_host,
+               destination_port=config.destination_port,
+               listen_host=config.listen_host,
+               listen_port=config.listen_port,
+               announce_host=config.announce_host,
+               announce_port=config.announce_port)
     s.run()
