@@ -83,13 +83,22 @@ class LoginProtocol:
         ret.motd = msg.getString()
 
         assert(msg.getByte() == 0x64)
+
+        num_worlds = msg.getByte()
+        assert(num_worlds == 1)  # more is currently not supported.
+        world_id = msg.getByte()
+        world_name = msg.getString()
+        ip = msg.getString()
+        port = msg.getU16()
+        msg.skipBytes(1)  # no idea what's that.
+
         num_chars = msg.getByte()
         for i in range(num_chars):
             char = LoginCharacterEntry()
+            world_num = msg.getByte()
             char.name = msg.getString()
-            char.world = msg.getString()
-            char.ip = u32_to_ip(msg.getU32())
-            char.port = msg.getU16()
+            char.ip = ip
+            char.port = port
             ret.characters += [char]
 
         return ret
