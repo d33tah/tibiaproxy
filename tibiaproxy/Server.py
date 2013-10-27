@@ -180,7 +180,7 @@ class Server:
 
         Returns None
         """
-        while self.running:
+        while True:
             conn, addr = self.l_s.accept()
             log("Received a login connection from %s:%s" % addr)
             data = conn.recv(1024)
@@ -192,7 +192,7 @@ class Server:
 
         Returns None
         """
-        while self.running:
+        while True:
             conn, addr = self.g_s.accept()
             log("Received a game server connection from %s:%s" % addr)
             data = conn.recv(1024)
@@ -214,8 +214,6 @@ class Server:
 
         self.l_s.listen(1)
         self.g_s.listen(1)
-
-        self.running = True
 
         t_l = threading.Thread(target=self.serveLogin)
         g_l = threading.Thread(target=self.serveGame)
