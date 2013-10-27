@@ -69,6 +69,10 @@ class LoginProtocol:
         ret = LoginReply()
 
         size = msg.getU16()
+
+        # someday perhaps I'll have enough time to even check the checksums!
+        checksum = msg.getU32()
+
         msg = XTEA.decrypt(msg, xtea_key)
         assert(len(msg.getBuffer()) == size)
         decrypted_size = msg.getU16()
