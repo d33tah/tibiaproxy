@@ -32,7 +32,6 @@ class LoginCharacterEntry:
     world = ""
     ip = 0
     port = 0
-    keys = []
 
 
 class LoginReply:
