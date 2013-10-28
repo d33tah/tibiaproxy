@@ -86,9 +86,9 @@ class Server:
         # TODO: save the original IP addresses in a dictionary so that game
         # server IPs different than the login server IP.
         client_reply = copy.copy(reply)
-        for character in client_reply.characters:
-            character.ip = self.announce_host
-            character.port = self.announce_port
+        for world in client_reply.worlds:
+            world.hostname = self.announce_host
+            world.port = self.announce_port
         client_reply_msg = proto.prepareReply(client_reply, xtea_key)
 
         # Send the message and close the connection.

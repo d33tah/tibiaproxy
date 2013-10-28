@@ -26,18 +26,23 @@ from XTEA import XTEA
 from util import *
 
 
+class LoginWorldEntry:
+    name = ""
+    hostname = ""
+    port = 0
+
+
 class LoginCharacterEntry:
     """Describes a single character list item from the login protocol."""
     name = ""
-    world = ""
-    ip = 0
-    port = 0
+    world = None
 
 
 class LoginReply:
     """Describes a login protocol reply."""
     motd = ""
     characters = []
+    worlds = []
 
 
 class LoginProtocol:
@@ -85,16 +90,20 @@ class LoginProtocol:
 
         num_worlds = msg.getByte()
         assert(num_worlds == 1)  # more is currently not supported.
+        world = LoginWorldEntry()
         world_id = msg.getByte()
-        world_name = msg.getString()
-        ip = msg.getString()
-        port = msg.getU16()
+        world.name = msg.getString()
+        world.hostname = msg.getString()
+        world.port = msg.getU16()
         msg.skipBytes(1)  # no idea what's that.
+        ret.worlds += [world]
 
         num_chars = msg.getByte()
         for i in range(num_chars):
             char = LoginCharacterEntry()
             world_num = msg.getByte()
+            assert(world_num == 0)
+            char.world = world
             char.name = msg.getString()
             char.ip = ip
             char.port = port
@@ -116,12 +125,21 @@ class LoginProtocol:
         ret.addByte(0x14)
         ret.addString(login_reply.motd)
         ret.addByte(0x64)
+
+        ret.addByte(len(login_reply.worlds))
+        world_id = 0
+        for world in login_reply.worlds:
+            ret.addByte(world_id)
+            ret.addString(world.name)
+            ret.addString(world.hostname)
+            ret.addU16(world.port)
+            ret.addByte(0)
+            world_id += 1
+
         ret.addByte(len(login_reply.characters))
         for char in login_reply.characters:
+            ret.addByte(login_reply.worlds.index(char.world))
             ret.addString(char.name)
-            ret.addString(char.world)
-            ret.addU32(ip_to_u32(char.ip))
-            ret.addU16(char.port)
         # FIXME: This is probably wrong. See what's the right way and keep in
         # mind that getBuffer makes the buffer temporarily larger.
         ret.prependU16(len(ret.getBuffer()))
