@@ -140,8 +140,12 @@ class LoginProtocol:
         for char in login_reply.characters:
             ret.addByte(login_reply.worlds.index(char.world))
             ret.addString(char.name)
+        ret.addByte(0x00)
+        ret.addByte(0x00)
         # FIXME: This is probably wrong. See what's the right way and keep in
         # mind that getBuffer makes the buffer temporarily larger.
         ret.prependU16(len(ret.getBuffer()))
+        for i in range(8 - ((len(ret.getBuffer()) - 2) % 8)):
+            ret.addByte(0x33)
         ret = XTEA.encrypt(ret, xtea_key)
         return ret
