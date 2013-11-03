@@ -27,7 +27,7 @@ import copy
 import time
 import threading
 import sys
-
+import struct
 
 class Server:
     """Runs the proxy, coordinating the data flow between the user, proxy and
@@ -97,7 +97,7 @@ class Server:
         conn.send(client_reply_msg.getBuffer(0))
         conn.close()
 
-    def handleGame(self, conn, data):
+    def handleGame(self, conn):
         """Connect to the game server, relay the packets between the the
         player, the proxy and the game server, reading them and running
         callbacks based on incoming/outgoing data.
@@ -116,10 +116,15 @@ class Server:
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         log("Connecting to the hardcoded game server...")
         dest_s.connect((self.destination_host, self.destination_port))
+        conn.send('\x0c\x00\xd9\x02\xaa\t\x06\x00\x1f\xefYvR\xa3')
+
+        data = conn.recv(2)
+        size = struct.unpack("<H", data)[0]
+        data += conn.recv(size)
 
         # Read the XTEA key from the player, pass on the original packet.
         msg = NetworkMessage(data)
-        xtea_key = LoginProtocol().parseFirstMessage(msg, 7)
+        xtea_key = LoginProtocol().parseFirstMessage(msg, 16)
         dest_s.send(data)
 
         # You might not know this trick.
@@ -197,9 +202,7 @@ class Server:
         while True:
             conn, addr = self.g_s.accept()
             log("Received a game server connection from %s:%s" % addr)
-            data = conn.recv(1024)
-            msg = NetworkMessage(data)
-            self.handleGame(conn, data)
+            self.handleGame(conn)
 
     def run(self):
         """Run serveLogin and serveGame threads and sleep forever.
