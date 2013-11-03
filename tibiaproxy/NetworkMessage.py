@@ -25,6 +25,13 @@ import struct
 
 
 def adlerChecksum(buf):
+    """Calculates the Adler checksum for the given buffer.
+
+    Args:
+        buf (str): the buffer that will have its Adler checksum calculated
+
+    Returns int
+    """
     length = len(buf)
     adler = 65521
     a = 1
@@ -135,6 +142,10 @@ class NetworkMessage:
             return struct.pack("<H", len(self.buf) - substract) + self.buf
 
     def getRaw(self):
+        """Returns the raw buffer without any additional headers.
+
+        Returns str
+        """
         return self.buf
 
     def addByte(self, byte):
