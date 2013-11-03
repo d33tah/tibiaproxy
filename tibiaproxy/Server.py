@@ -29,6 +29,7 @@ import threading
 import sys
 import struct
 
+
 class Server:
     """Runs the proxy, coordinating the data flow between the user, proxy and
     the server."""
