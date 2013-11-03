@@ -34,12 +34,15 @@ class Server:
     """Runs the proxy, coordinating the data flow between the user, proxy and
     the server."""
 
-    def __init__(self, destination_host, destination_port,
+    def __init__(self, destination_login_host, destination_login_port,
+                 destination_game_host, destination_game_port,
                  listen_login_host, listen_login_port,
                  listen_game_host, listen_game_port,
                  announce_host, announce_port):
-        self.destination_host = destination_host
-        self.destination_port = int(destination_port)
+        self.destination_login_host = destination_login_host
+        self.destination_login_port = int(destination_login_port)
+        self.destination_game_host = destination_game_host
+        self.destination_game_port = int(destination_game_port)
         self.listen_login_host = listen_login_host
         self.listen_login_port = int(listen_login_port)
         self.listen_game_host = listen_game_host
@@ -75,7 +78,8 @@ class Server:
         # Connect to the destination host, send the request and read the reply.
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         log("Connecting to the destination host...")
-        dest_s.connect((self.destination_host, self.destination_port))
+        dest_s.connect((self.destination_login_host,
+                        self.destination_login_port))
         dest_s.send(msg.getBuffer())
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
@@ -115,9 +119,14 @@ class Server:
 
         # Connect to the game server.
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        log("Connecting to the hardcoded game server...")
-        dest_s.connect((self.destination_host, self.destination_port))
-        conn.send('\x0c\x00\xd9\x02\xaa\t\x06\x00\x1f\xefYvR\xa3')
+        log("Connecting to the hardcoded game server (%s:%s)..." % (
+            self.destination_game_host, self.destination_game_port))
+        dest_s.connect((self.destination_game_host,
+                        self.destination_game_port))
+        buf = dest_s.recv(1024)
+        #print("gameHelloBuf=%s" % repr(buf))
+        #conn.send('\x0c\x00\xd9\x02\xaa\t\x06\x00\x1f\xefYvR\xa3')
+        conn.send(buf)
 
         data = conn.recv(2)
         size = struct.unpack("<H", data)[0]
@@ -215,8 +224,8 @@ class Server:
                                               self.listen_login_port,
                                               self.listen_game_host,
                                               self.listen_game_port,
-                                              self.destination_host,
-                                              self.destination_port))
+                                              self.destination_login_host,
+                                              self.destination_login_port))
 
         self.l_s.listen(1)
         self.g_s.listen(1)
