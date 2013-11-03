@@ -74,7 +74,7 @@ class XTEA:
 
         Returns NetworkMessage
         """
-        buf = msg.getRest()
+        buf = msg.getBuffer()
         ret = ""
         for offset in range(len(buf)/8):
             v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
