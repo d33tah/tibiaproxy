@@ -105,8 +105,6 @@ class LoginProtocol:
             assert(world_num == 0)
             char.world = world
             char.name = msg.getString()
-            char.ip = ip
-            char.port = port
             ret.characters += [char]
 
         return ret
