@@ -16,7 +16,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
-from NetworkMessage import NetworkMessage
+from NetworkMessage import NetworkMessage, adlerChecksum
 from LoginProtocol import LoginProtocol
 from XTEA import XTEA
 from util import *
@@ -90,9 +90,11 @@ class Server:
             world.hostname = self.announce_host
             world.port = self.announce_port
         client_reply_msg = proto.prepareReply(client_reply, xtea_key)
+        checksum = adlerChecksum(client_reply_msg.getRaw())
+        client_reply_msg.prependU32(checksum)
 
         # Send the message and close the connection.
-        conn.send(client_reply_msg.getBuffer())
+        conn.send(client_reply_msg.getBuffer(0))
         conn.close()
 
     def handleGame(self, conn, data):

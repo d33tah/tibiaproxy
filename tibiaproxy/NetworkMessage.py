@@ -24,6 +24,24 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 import struct
 
 
+def adlerChecksum(buf):
+    length = len(buf)
+    adler = 65521
+    a = 1
+    b = 0
+    pos = 0
+    while length > 0:
+        tmp = 5552 if length > 5552 else length
+        length -= tmp
+        for i in reversed(range(tmp)):
+            a += ord(buf[pos])
+            b += a
+            pos += 1
+        a %= adler
+        b %= adler
+    return (b << 16) | a
+
+
 class NetworkMessage:
     """A utility class used to extract structures out of network messages and
     build custom ones."""
@@ -103,7 +121,7 @@ class NetworkMessage:
         """
         return self.buf[self.pos:]
 
-    def getBuffer(self):
+    def getBuffer(self, substract=6):
         """Returns the whole buffer of the network message.
 
         If the buffer is marked as writable, it is returned with its size
@@ -114,7 +132,10 @@ class NetworkMessage:
         if not self.writable:
             return self.buf
         else:
-            return struct.pack("<H", len(self.buf)) + self.buf
+            return struct.pack("<H", len(self.buf) - substract) + self.buf
+
+    def getRaw(self):
+        return self.buf
 
     def addByte(self, byte):
         """Adds a unsigned 8-bit integer to the end of the network message.
@@ -164,6 +185,19 @@ class NetworkMessage:
         """
         assert(self.writable)
         self.buf = struct.pack("<H", u16) + self.buf
+
+    def prependU32(self, u32):
+        """Adds an unsigned 32-bit integer to the beginning of the network
+        message.
+
+        Args:
+            u32 (int): the unsigned 32-bit integer to be prepended to the
+                network message
+
+        Returns None
+        """
+        assert(self.writable)
+        self.buf = struct.pack("<I", u32) + self.buf
 
     def addString(self, _str):
         """Adds a string to the end of the network message.

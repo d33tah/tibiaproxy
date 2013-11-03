@@ -78,9 +78,9 @@ class LoginProtocol:
         msg.skipBytes(4)
 
         msg = XTEA.decrypt(msg, xtea_key)
-        assert(len(msg.getBuffer()) == size)
+        #assert(len(msg.getBuffer()) == size)
         decrypted_size = msg.getU16()
-        assert(decrypted_size == size - 5)
+        #assert(decrypted_size == size - 5)
 
         packet_type = msg.getByte()
         assert(packet_type == 0x14)
@@ -142,8 +142,7 @@ class LoginProtocol:
         ret.addByte(0x00)
         # FIXME: This is probably wrong. See what's the right way and keep in
         # mind that getBuffer makes the buffer temporarily larger.
-        ret.prependU16(len(ret.getBuffer()))
-        for i in range(8 - ((len(ret.getBuffer()) - 2) % 8)):
+        for i in range(8 - ((len(ret.getBuffer())) % 8)):
             ret.addByte(0x33)
         ret = XTEA.encrypt(ret, xtea_key)
         return ret
