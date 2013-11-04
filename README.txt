@@ -1,4 +1,4 @@
-tibiaproxy v2.0
+tibiaproxy v2.1
 ===============
 
 Tibia proxy is a proof of concept proxy for OpenTibia servers with protocol
