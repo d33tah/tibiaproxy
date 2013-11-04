@@ -27,6 +27,7 @@ from util import *
 
 
 class LoginWorldEntry:
+    """Describes a single world list item."""
     def __init__(self):
         self.name = ""
         self.hostname = ""
