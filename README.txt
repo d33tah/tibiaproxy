@@ -1,5 +1,5 @@
-tibiaproxy v2.0-git
-===================
+tibiaproxy v2.0
+===============
 
 Tibia proxy is a proof of concept proxy for OpenTibia servers with protocol
 version 10.20. Its goal is to provide you with a server you could run on a
@@ -8,7 +8,8 @@ trusted host that you could connect to, tunneling your Tibia session.
 Currently its login server code is very buggy, but it relays the game server
 packets correctly. It can decode "say" command and - as a proof of concept -
 it evaluates whatever the user tried to say and instead of passing it to the
-game server, sends it the result of the evaluation.
+game server, sends it the result of the evaluation. In order to try this out,
+begin your message with ">".
 
 WARNING
 =======
@@ -55,13 +56,17 @@ back to the user, with the server IPs changed so that the next connection will
 also be sent by proxy.
 
 Then, when a player requests a game server connection, an enormous kludge
-begins - in the current version, a connection is made to the login server (in
-hope that it also serves game server connections - sometimes it's not true)
-and the original packet is simply forwarded (we read the XTEA key, though).
-Then, all the communication between the player, the proxy and the game server
-is relayed so that the proxy feels invisible - with the exception that an
-attempt to say anything will result in printing the effect of evaluating the
-message as Python code instead of sending it over to the server.
+begins - in the current version, a connection is made to the login server and
+the original packet is simply forwarded (we read the XTEA key, though). The
+proxy modifies the reply from the server so that the world list all points to
+the proxy. Then, all the communication between the player, the proxy and
+the game server is relayed so that the proxy feels invisible - with the
+exception that an attempt to say anything will result in printing the effect
+of evaluating the message as Python code instead of sending it over to the
+server, provided that the message began with ">".
+
+The current destination game server IP is hardcoded in config.py. The proxy
+listens on two ports - one for the login server, one for game server.
 
 Bugs, problems
 ==============
@@ -69,13 +74,23 @@ Bugs, problems
 Currently, only a small fraction of the Tibia protocol is implemented and none
 of the features are guaranteed to work. At the moment of writing this
 document, the proxy tries to forward the modified character list, but it's
-broken. No game server proxying is implemented yet (though this document
-might be outdated).
+broken - only tested on Forgotten Server with a single character. The proxy
+will not notify the user if the credentials are invalid, but will crash
+instead. The game proxying works, but will crash from time to time due to
+assertion errors related to packet length.
 
 TO-DO list
 ==========
 
-In the future, there is a plan to add some record-and-replay/scripting
+* clean up the code related to packet building, RSA and XTEA
+* fix bug related to > 1 character
+* notify the user if the login/password are incorrect
+* investigate why sometimes the server message has incorrect length
+* fix the padding code
+* properly read the game server IP based on character name, not config.py
+* allow more than one login attempt
+
+In the far future, there is a plan to add some record-and-replay/scripting
 capabilities and port the proxy to the latest Tibia protocol.
 
 Author, license
