@@ -27,22 +27,25 @@ from util import *
 
 
 class LoginWorldEntry:
-    name = ""
-    hostname = ""
-    port = 0
+    def __init__(self):
+        self.name = ""
+        self.hostname = ""
+        self.port = 0
 
 
 class LoginCharacterEntry:
     """Describes a single character list item from the login protocol."""
-    name = ""
-    world = None
+    def __init__(self):
+        self.name = ""
+        self.world = None
 
 
 class LoginReply:
     """Describes a login protocol reply."""
-    motd = ""
-    characters = []
-    worlds = []
+    def __init__(self):
+        self.motd = ""
+        self.characters = []
+        self.worlds = []
 
 
 class LoginProtocol:
