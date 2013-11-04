@@ -97,8 +97,7 @@ Author, license
 ===============
 
 This application was written by Jacek Wielemborek <d33tah@gmail.com>. My blog
-can be found here:
-[http://deetah.jogger.pl/kategoria/english/](http://deetah.jogger.pl/kategoria/english/)
+can be found here: http://deetah.jogger.pl/kategoria/english/
 
 If you're not a viagra vendor, feel free to write me an e-mail, I'd be happy
 to hear that you use this program!
