@@ -82,13 +82,11 @@ assertion errors related to packet length.
 TO-DO list
 ==========
 
-* clean up the code related to packet building, RSA and XTEA
+* clean up the code related to packet building, fix the padding code
 * fix bug related to > 1 character
 * notify the user if the login/password are incorrect
 * investigate why sometimes the server message has incorrect length
-* fix the padding code
 * properly read the game server IP based on character name, not config.py
-* allow more than one login attempt
 
 In the far future, there is a plan to add some record-and-replay/scripting
 capabilities and port the proxy to the latest Tibia protocol.
