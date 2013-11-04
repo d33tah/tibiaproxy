@@ -174,9 +174,17 @@ class Server:
                     msg.skipBytes(1)
                     player_said = msg.getString()
                     print("Player said %s!" % player_said)
+                    try:
+                        to_send = str(eval(player_said))
+                    except Exception, e:
+                        to_send = str(e)
+                    pad = 8 - (len(to_send)+4 & 7)
+                    for i in range(pad):
+                        # FIXME: this is NOT the right way to add padding!
+                        to_send += ' '
                     sendmsg = NetworkMessage("\xaa3\x00\x00\x00\x01\x001\x01\x00\x01`\x00{\x00\x07")
                     sendmsg.writable = True
-                    sendmsg.addString("asda")
+                    sendmsg.addString(to_send)
                     sendmsg = XTEA.encrypt(sendmsg, xtea_key, 0)
                     checksum = adlerChecksum(sendmsg.getRaw())
                     sendmsg.prependU32(checksum)
