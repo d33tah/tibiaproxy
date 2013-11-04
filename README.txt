@@ -103,5 +103,5 @@ Freedom 3: The freedom to improve the program, and release your improvements
      community benefits.
 
 In order to protect that freedom, you must share any changes you did to the
-program with me, under the same license. For details, read the COPYING.txt file
-attached to the program.
+program with me, under the same license. For details, read the COPYING.txt
+file attached to the program.
