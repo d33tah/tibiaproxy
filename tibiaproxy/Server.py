@@ -167,6 +167,7 @@ class Server:
                 msg = XTEA.decrypt(msg, xtea_key)
                 msg.getU16()
                 packet_type = msg.getByte()
+                player_said = ""
                 if packet_type == 150:
                     # We got a player "say" request. Read what the player
                     # wanted to say, treat it like a Python expression and send
@@ -174,8 +175,9 @@ class Server:
                     msg.skipBytes(1)
                     player_said = msg.getString()
                     print("Player said %s!" % player_said)
+                if player_said.startswith(">"):
                     try:
-                        to_send = str(eval(player_said))
+                        to_send = str(eval(player_said[1:].lstrip()))
                     except Exception, e:
                         to_send = str(e)
                     pad = 8 - (len(to_send)+4 & 7)
@@ -189,8 +191,9 @@ class Server:
                     checksum = adlerChecksum(sendmsg.getRaw())
                     sendmsg.prependU32(checksum)
                     conn.send(sendmsg.getBuffer(0))
-                # Otherwise, just pass the packet to the server.
-                dest_s.send(data)
+                else:
+                    # Otherwise, just pass the packet to the server.
+                    dest_s.send(data)
             if dest_s in has_data:
                 # Server sent us some data. Currently, no parsing is done -
                 # just pass it to the player.

@@ -2,7 +2,7 @@ tibiaproxy v2.0-git
 ===================
 
 Tibia proxy is a proof of concept proxy for OpenTibia servers with protocol
-version 8.20. Its goal is to provide you with a server you could run on a
+version 10.20. Its goal is to provide you with a server you could run on a
 trusted host that you could connect to, tunneling your Tibia session.
 
 Currently its login server code is very buggy, but it relays the game server
