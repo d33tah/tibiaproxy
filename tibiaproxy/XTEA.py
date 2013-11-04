@@ -18,8 +18,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 import struct
 
-from NetworkMessage import NetworkMessage
-
 
 class U32:
     """Emulates 32-bit unsigned int known from C programming language."""
@@ -61,64 +59,54 @@ class U32:
         return r
 
 
-class XTEA:
-    """Handles XTEA messages encryption/decryption."""
+def XTEA_encrypt(buf, k):
+    """Encrypts a given message using the given key.
 
-    @classmethod
-    def encrypt(cls, msg, k, appendLen=None):
-        """Encrypts a given message using the given key.
+    Args:
+        buf (str): the data to be encrypted
+        k (list): XTEA key - a list of four OpenTibia U32 integers
 
-        Args:
-            msg (NetworkMessage): the network message pointed to encrypted data
-            k (list): XTEA key - a list of four OpenTibia U32 integers
+    Returns NetworkMessage
+    """
+    ret = ""
+    for offset in range(len(buf)/8):
+        v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
+        v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
+        delta = U32(0x61C88647)
+        sum = U32(0)
 
-        Returns NetworkMessage
-        """
-        if appendLen is not None:
-            buf = msg.getBuffer(appendLen)
-        else:
-            buf = msg.getBuffer()
-        ret = ""
-        for offset in range(len(buf)/8):
-            v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
-            v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
-            delta = U32(0x61C88647)
-            sum = U32(0)
+        for i in range(32):
+            v0 += ((v1 << U32(4) ^ v1 >> U32(5)) + v1) ^ \
+                  (sum + U32(k[sum & U32(3)]))
+            sum -= delta
+            v1 += ((v0 << U32(4) ^ v0 >> U32(5)) + v0) ^ \
+                  (sum + U32(k[sum >> U32(11) & U32(3)]))
 
-            for i in range(32):
-                v0 += ((v1 << U32(4) ^ v1 >> U32(5)) + v1) ^ \
-                      (sum + U32(k[sum & U32(3)]))
-                sum -= delta
-                v1 += ((v0 << U32(4) ^ v0 >> U32(5)) + v0) ^ \
-                      (sum + U32(k[sum >> U32(11) & U32(3)]))
+        ret += struct.pack("<I", v0) + struct.pack("<I", v1)
+    return ret
 
-            ret += struct.pack("<I", v0) + struct.pack("<I", v1)
-        return NetworkMessage(ret, True)
+def XTEA_decrypt(buf, k):
+    """Decrypts a given message using the given key.
 
-    @classmethod
-    def decrypt(cls, msg, k):
-        """Decrypts a given message using the given key.
+    Args:
+        buf (str): the data to be decrypted
+        k (list): XTEA key - a list of four OpenTibia U32 integers
 
-        Args:
-            msg (NetworkMessage): the network message pointed to decrypted data
-            k (list): XTEA key - a list of four OpenTibia U32 integers
+    Returns NetworkMessage
+    """
+    ret = ""
+    for offset in range(len(buf)/8):
+        v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
+        v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
+        delta = U32(0x61C88647)
+        sum = U32(0xC6EF3720)
 
-        Returns NetworkMessage
-        """
-        buf = msg.getRest()
-        ret = ""
-        for offset in range(len(buf)/8):
-            v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
-            v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
-            delta = U32(0x61C88647)
-            sum = U32(0xC6EF3720)
+        for i in range(32):
+            v1 -= ((v0 << U32(4) ^ v0 >> U32(5)) + v0) ^ \
+                  (sum + U32(k[sum >> U32(11) & U32(3)]))
+            sum += delta
+            v0 -= ((v1 << U32(4) ^ v1 >> U32(5)) + v1) ^ \
+                  (sum + U32(k[sum & U32(3)]))
 
-            for i in range(32):
-                v1 -= ((v0 << U32(4) ^ v0 >> U32(5)) + v0) ^ \
-                      (sum + U32(k[sum >> U32(11) & U32(3)]))
-                sum += delta
-                v0 -= ((v1 << U32(4) ^ v1 >> U32(5)) + v1) ^ \
-                      (sum + U32(k[sum & U32(3)]))
-
-            ret += struct.pack("<I", v0) + struct.pack("<I", v1)
-        return NetworkMessage(ret)
+        ret += struct.pack("<I", v0) + struct.pack("<I", v1)
+    return ret

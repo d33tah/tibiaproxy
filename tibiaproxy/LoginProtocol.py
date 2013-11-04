@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 from NetworkMessage import NetworkMessage
 from RSA import RSA
-from XTEA import XTEA
+import XTEA
 from util import *
 
 
@@ -77,7 +77,8 @@ class LoginProtocol:
         # someday perhaps I'll have enough time to even check the checksums!
         msg.skipBytes(4)
 
-        msg = XTEA.decrypt(msg, xtea_key)
+        msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
+        msg = NetworkMessage(msg_buf)
         #assert(len(msg.getBuffer()) == size)
         decrypted_size = msg.getU16()
         #assert(decrypted_size == size - 5)
@@ -144,5 +145,5 @@ class LoginProtocol:
         # mind that getBuffer makes the buffer temporarily larger.
         for i in range(8 - ((len(ret.getBuffer())) % 8)):
             ret.addByte(0x33)
-        ret = XTEA.encrypt(ret, xtea_key)
-        return ret
+        ret_buf = XTEA.XTEA_encrypt(ret.getBuffer(), xtea_key)
+        return NetworkMessage(ret_buf)

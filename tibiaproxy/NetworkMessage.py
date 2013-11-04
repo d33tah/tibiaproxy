@@ -53,23 +53,15 @@ class NetworkMessage:
     """A utility class used to extract structures out of network messages and
     build custom ones."""
 
-    def __init__(self, buf=None, writable=False):
+    def __init__(self, buf=None):
         """Create a NetworkMessage instance.
 
         If no arguments are given, an empty network message used for writing
-        is created. If a buffer is given, the network message cannot be
-        modified unless "writable" argument is set to True as well.
+        is created.
 
         Args:
-            buf (str): the initial buffer. If a buffer is given, the network
-                message cannot be modified unless "writable" argument is
-                explicitly set to True.
-            writable (bool): specifies whether the message should be writable.
-                By default, if a buffer is given, the network message cannot
-                be modified unless "writable" argument is explicitly set to
-                True.
+            buf (str): the initial buffer.
         """
-        self.writable = (buf is None or writable)
         self.buf = buf or ""
         self.pos = 0
 
@@ -129,17 +121,12 @@ class NetworkMessage:
         return self.buf[self.pos:]
 
     def getBuffer(self, substract=6):
-        """Returns the whole buffer of the network message.
-
-        If the buffer is marked as writable, it is returned with its size
+        """Returns the whole buffer of the network message, along with its size
         prepended to the returned string, without affecting the inner buffer.
 
         Returns str
         """
-        if not self.writable:
-            return self.buf
-        else:
-            return struct.pack("<H", len(self.buf) - substract) + self.buf
+        return struct.pack("<H", len(self.buf) - substract) + self.buf
 
     def getRaw(self):
         """Returns the raw buffer without any additional headers.
@@ -157,7 +144,6 @@ class NetworkMessage:
 
         Returns None
         """
-        assert(self.writable)
         self.buf += chr(byte)
 
     def addU32(self, u32):
@@ -169,7 +155,6 @@ class NetworkMessage:
 
         Returns None
         """
-        assert(self.writable)
         self.buf += struct.pack("<I", u32)
 
     def addU16(self, u16):
@@ -181,7 +166,6 @@ class NetworkMessage:
 
         Returns None
         """
-        assert(self.writable)
         self.buf += struct.pack("<H", u16)
 
     def prependU16(self, u16):
@@ -194,7 +178,6 @@ class NetworkMessage:
 
         Returns None
         """
-        assert(self.writable)
         self.buf = struct.pack("<H", u16) + self.buf
 
     def prependU32(self, u32):
@@ -207,7 +190,6 @@ class NetworkMessage:
 
         Returns None
         """
-        assert(self.writable)
         self.buf = struct.pack("<I", u32) + self.buf
 
     def addString(self, _str):
@@ -218,6 +200,5 @@ class NetworkMessage:
 
         Returns None
         """
-        assert(self.writable)
         self.buf += struct.pack("<H", len(_str))
         self.buf += _str

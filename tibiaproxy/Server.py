@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 from NetworkMessage import NetworkMessage, adlerChecksum
 from LoginProtocol import LoginProtocol
-from XTEA import XTEA
+import XTEA
 from util import *
 
 import select
@@ -80,7 +80,7 @@ class Server:
         log("Connecting to the destination host...")
         dest_s.connect((self.destination_login_host,
                         self.destination_login_port))
-        dest_s.send(msg.getBuffer())
+        dest_s.send(msg.getRaw())
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
         reply = proto.parseReply(msg, xtea_key)
@@ -164,7 +164,8 @@ class Server:
                 msg_size = msg.getU16()
                 msg.getU32()
                 assert(msg_size == len(data) - 2)
-                msg = XTEA.decrypt(msg, xtea_key)
+                msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
+                msg = NetworkMessage(msg_buf)
                 msg.getU16()
                 packet_type = msg.getByte()
                 player_said = ""
@@ -187,7 +188,8 @@ class Server:
                     sendmsg = NetworkMessage("\xaa3\x00\x00\x00\x01\x001\x01\x00\x01`\x00{\x00\x07")
                     sendmsg.writable = True
                     sendmsg.addString(to_send)
-                    sendmsg = XTEA.encrypt(sendmsg, xtea_key, 0)
+                    sendmsg_buf = XTEA.XTEA_encrypt(sendmsg.getBuffer(0), xtea_key)
+                    sendmsg = NetworkMessage(sendmsg_buf)
                     checksum = adlerChecksum(sendmsg.getRaw())
                     sendmsg.prependU32(checksum)
                     conn.send(sendmsg.getBuffer(0))
