@@ -14,15 +14,16 @@ WARNING
 =======
 
 In case of MMORPG hacks, detection is way simpler than you might think. While
-using this application, keep in mind that you get banned from playing the
-game, perhaps even on a per-IP basis. Should this happen, I am IN NO WAY
+using this application, keep in mind that you might get banned from playing
+the game, perhaps even on a per-IP basis. Should this happen, I am IN NO WAY
 RESPONSIBLE.
 
 Also, keep in mind that the account name and password is being sent to the
 proxy in a basically **UNENCRYPTED** form - it is using the OpenTibia keys,
 for which the private key is known. This means that anyone able to sniff the
 connection between you and your proxy will be able to see what is your account
-name and passwordwhich is a problem if the proxy is not in your local network.
+name and password, which is a problem if the proxy is not in your local
+network.
 
 (sniffing is a real threat and even your neighbor can do that - read up about
 ARP spoofing). If your proxy server is hosted on a Unix host, you might want
@@ -66,10 +67,10 @@ Bugs, problems
 ==============
 
 Currently, only a small fraction of the Tibia protocol is implemented and none
-of the features are guaranteed to work. At the moment of writing this document,
-the proxy tries to forward the modified character list, but it's broken. No
-game server proxying is implemented yet (though this document might be
-outdated).
+of the features are guaranteed to work. At the moment of writing this
+document, the proxy tries to forward the modified character list, but it's
+broken. No game server proxying is implemented yet (though this document
+might be outdated).
 
 TO-DO list
 ==========
