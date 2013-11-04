@@ -63,35 +63,30 @@ def byte_to_hex(i):
     return zero_padded
 
 
-class RSA:
-    """Handles RSA operations."""
+def RSA_decrypt(c_bin):
+    """Decrypts an RSA-encrypted message with an OpenTibia key.
 
-    @classmethod
-    def decrypt(cls, msg):
-        """Decrypts an RSA-encrypted message with an OpenTibia key.
+    Args:
+        c_bin (str): the message to be decrypted
 
-        Args:
-            msg (str): the message to be decrypted
+    Returns str
+    """
+    c_hex = ''.join([byte_to_hex(i) for i in c_bin])
 
-        Returns NetworkMessage
-        """
-        c_bin = msg.getRest()[:128]
-        c_hex = ''.join([byte_to_hex(i) for i in c_bin])
+    c = int(c_hex, 16)
 
-        c = int(c_hex, 16)
+    n = p*q
+    # z = c^d % n, way faster than z = c**d % n
+    z = pow(c, d, n)
 
-        n = p*q
-        # z = c^d % n, way faster than z = c**d % n
-        z = pow(c, d, n)
+    z_hex = "%x" % z
+    if len(z_hex) % 2 != 0:
+        z_hex = "0" + z_hex
 
-        z_hex = "%x" % z
-        if len(z_hex) % 2 != 0:
-            z_hex = "0" + z_hex
+    # Now, convert the hexadecimal form to a binary one.
+    z_bin = ""
+    for i in range(len(z_hex)/2):
+        chunk = z_hex[i*2:(i+1)*2]
+        z_bin += chr(int(chunk, 16))
 
-        # Now, convert the hexadecimal form to a binary one.
-        z_bin = ""
-        for i in range(len(z_hex)/2):
-            chunk = z_hex[i*2:(i+1)*2]
-            z_bin += chr(int(chunk, 16))
-
-        return NetworkMessage(z_bin)
+    return z_bin

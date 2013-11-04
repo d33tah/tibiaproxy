@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
 from NetworkMessage import NetworkMessage
-from RSA import RSA
+import RSA
 import XTEA
 from util import *
 
@@ -58,7 +58,8 @@ class LoginProtocol:
         Returns list
         """
         msg.skipBytes(skip_bytes)
-        msg = RSA.decrypt(msg)
+        msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
+        msg = NetworkMessage(msg_buf)
         # Extract the XTEA keys from the RSA-decrypted message.
         return [msg.getU32() for i in range(4)]
 
