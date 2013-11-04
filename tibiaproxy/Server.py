@@ -157,6 +157,9 @@ class Server:
             has_data, _, _ = select.select([conn, dest_s], [], [])
             if conn in has_data:
                 data = conn.recv(1024)
+                if data == '':
+                    log("The client disconnected")
+                    break
                 msg = NetworkMessage(data)
                 msg_size = msg.getU16()
                 assert(msg_size == len(data) - 2)
