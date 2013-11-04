@@ -35,7 +35,7 @@ class LoginWorldEntry:
 
 
 class LoginCharacterEntry:
-    """Describes a single character list item from the login protocol."""
+    """Describes a single character list item."""
     def __init__(self):
         self.name = ""
         self.world = None
