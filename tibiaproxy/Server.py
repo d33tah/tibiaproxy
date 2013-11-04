@@ -185,7 +185,15 @@ class Server:
                     for i in range(pad):
                         # FIXME: this is NOT the right way to add padding!
                         to_send += ' '
-                    sendmsg = NetworkMessage("\xaa3\x00\x00\x00\x01\x001\x01\x00\x01`\x00{\x00\x07")
+                    sendmsg = NetworkMessage()
+                    sendmsg.addByte(0xAA)
+                    sendmsg.addU32(3)  # statement ID
+                    sendmsg.addString("1")
+                    sendmsg.addU16(1)  # level
+                    sendmsg.addByte(1)  # type: SPEAK_SAY
+                    sendmsg.addU16(96)  # pos
+                    sendmsg.addU16(123)
+                    sendmsg.addByte(7)
                     sendmsg.writable = True
                     sendmsg.addString(to_send)
                     sendmsg_buf = XTEA.XTEA_encrypt(sendmsg.getBuffer(0), xtea_key)
