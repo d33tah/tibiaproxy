@@ -193,6 +193,10 @@ class Server:
                 # Server sent us some data. Currently, no parsing is done -
                 # just pass it to the player.
                 data = dest_s.recv(1024)
+                if data == '':
+                    conn.close()
+                    log("The server disconnected")
+                    break
                 conn.send(data)
 
     def serveLogin(self):
