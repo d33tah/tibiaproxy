@@ -162,6 +162,7 @@ class Server:
                     break
                 msg = NetworkMessage(data)
                 msg_size = msg.getU16()
+                msg.getU32()
                 assert(msg_size == len(data) - 2)
                 msg = XTEA.decrypt(msg, xtea_key)
                 msg.getU16()
@@ -173,20 +174,13 @@ class Server:
                     msg.skipBytes(1)
                     player_said = msg.getString()
                     print("Player said %s!" % player_said)
-                    try:
-                        to_send = str(eval(player_said))
-                    except Exception, e:
-                        to_send = str(e)
-                    sendmsg = NetworkMessage()
-                    sendmsg.addByte(0xB4)  # send text message
-                    sendmsg.addByte(0x1A)  # console, orange text
-                    sendmsg.addString(to_send)
-                    sendmsg.prependU16(len(sendmsg.getBuffer()) - 2)
-                    # Add some padding bytes.
-                    for i in range(8 - (len(sendmsg.getBuffer()) % 8)):
-                        sendmsg.addByte(0x33)
-                    sendmsg = XTEA.encrypt(sendmsg, xtea_key)
-                    conn.send(sendmsg.getBuffer())
+                    sendmsg = NetworkMessage("\xaa3\x00\x00\x00\x01\x001\x01\x00\x01`\x00{\x00\x07")
+                    sendmsg.writable = True
+                    sendmsg.addString("asda")
+                    sendmsg = XTEA.encrypt(sendmsg, xtea_key, 0)
+                    checksum = adlerChecksum(sendmsg.getRaw())
+                    sendmsg.prependU32(checksum)
+                    conn.send(sendmsg.getBuffer(0))
                 # Otherwise, just pass the packet to the server.
                 dest_s.send(data)
             if dest_s in has_data:

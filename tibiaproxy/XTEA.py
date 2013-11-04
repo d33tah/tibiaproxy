@@ -65,7 +65,7 @@ class XTEA:
     """Handles XTEA messages encryption/decryption."""
 
     @classmethod
-    def encrypt(cls, msg, k):
+    def encrypt(cls, msg, k, appendLen=None):
         """Encrypts a given message using the given key.
 
         Args:
@@ -74,7 +74,10 @@ class XTEA:
 
         Returns NetworkMessage
         """
-        buf = msg.getBuffer()
+        if appendLen is not None:
+            buf = msg.getBuffer(appendLen)
+        else:
+            buf = msg.getBuffer()
         ret = ""
         for offset in range(len(buf)/8):
             v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
