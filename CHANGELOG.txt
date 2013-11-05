@@ -6,11 +6,11 @@ The following is a log of changes for the tibiaproxy project.
   port from 7172 to 7171.
 * Split the proxy socket between the game server and the login server.
 
-1.1
+1.1 [26 Oct 2013]
 
 * Removed NumPy as the dependency.
 
-1.0
+1.0 [26 Oct 2013]
 
 * initial support for 8.20 protocol
 * experimental login and game server relaying code
