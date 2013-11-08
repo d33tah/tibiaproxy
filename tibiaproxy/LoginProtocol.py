@@ -73,7 +73,7 @@ class LoginProtocol:
         Args:
             msg (NetworkMessage): the network message to be parsed.
 
-        Returns LoginReply
+        Returns LoginReply or None
         """
         ret = LoginReply()
 
@@ -89,7 +89,9 @@ class LoginProtocol:
         #assert(decrypted_size == size - 5)
 
         packet_type = msg.getByte()
-        assert(packet_type == 0x14)
+        if packet_type != 0x14:
+            # The reply doesn't seem to contain character list.
+            return None
         ret.motd = msg.getString()
 
         assert(msg.getByte() == 0x64)

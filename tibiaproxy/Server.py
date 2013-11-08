@@ -84,6 +84,12 @@ class Server:
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
         reply = proto.parseReply(msg, xtea_key)
+        if reply is None:
+            # The reply doesn't seem to contain character list - just forward
+            # it.
+            conn.send(data)
+            conn.close()
+            return
 
         # Replace the IP and port with the address to the proxy.
         # FIXME: the prepareReply is bugged, builds broken login server
