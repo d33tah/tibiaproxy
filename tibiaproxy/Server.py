@@ -30,6 +30,9 @@ import sys
 import struct
 
 
+latency_file = open("latencies.txt", "w")
+
+
 class Server:
     """Runs the proxy, coordinating the data flow between the user, proxy and
     the server."""
@@ -215,7 +218,8 @@ class Server:
                     # Otherwise, just pass the packet to the server.
                     before_send = time.time() - start
                     dest_s.send(data)
-                    log("client->server latency: %f [recv took %f, send took %s]" % (float(time.time() - start), float(recv_time), float(before_send)))
+                    latency_file.write("client->server latency: %f [recv took %f, send took %s]\n" % (float(time.time() - start), float(recv_time), float(before_send)))
+                    latency_file.flush()
             if dest_s in has_data:
                 # Server sent us some data. Currently, no parsing is done -
                 # just pass it to the player.
@@ -228,7 +232,8 @@ class Server:
                     break
                 before_send = time.time() - start
                 conn.send(data)
-                log("server->client latency: %f [recv took %f, send took %s]" % (float(time.time() - start), float(recv_time), float(before_send)))
+                latency_file.write("server->client latency: %f [recv took %f, send took %s]\n" % (float(time.time() - start), float(recv_time), float(before_send)))
+                latency_file.flush()
 
     def serveLogin(self):
         """Listen for login server connections and handle them.
