@@ -169,7 +169,9 @@ class Server:
                 msg = NetworkMessage(data)
                 msg_size = msg.getU16()
                 msg.getU32()
-                assert(msg_size == len(data) - 2)
+                if msg_size != len(data) - 2:
+                    log("Strange packet: %s" % repr(data))
+                    continue
                 msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
