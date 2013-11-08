@@ -103,6 +103,7 @@ class LoginProtocol:
         world.name = msg.getString()
         world.hostname = msg.getString()
         world.port = msg.getU16()
+        log("Received server address %s:%s" % (world.hostname, world.port))
         msg.skipBytes(1)  # no idea what's that.
         ret.worlds += [world]
 
