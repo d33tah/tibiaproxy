@@ -120,7 +120,7 @@ class NetworkMessage:
         """
         return self.buf[self.pos:]
 
-    def getBuffer(self, substract=6):
+    def getBuffer(self, substract):
         """Returns the whole buffer of the network message, along with its size
         prepended to the returned string, without affecting the inner buffer.
 

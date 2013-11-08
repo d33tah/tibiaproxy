@@ -150,7 +150,9 @@ class LoginProtocol:
         ret.addByte(0x00)
         # FIXME: This is probably wrong. See what's the right way and keep in
         # mind that getBuffer makes the buffer temporarily larger.
-        for i in range(8 - ((len(ret.getBuffer())) % 8)):
+        substract = 0
+        for i in range(8 - ((len(ret.getBuffer(0))) % 8)):
+            substract += 1
             ret.addByte(0x33)
-        ret_buf = XTEA.XTEA_encrypt(ret.getBuffer(), xtea_key)
+        ret_buf = XTEA.XTEA_encrypt(ret.getBuffer(substract), xtea_key)
         return NetworkMessage(ret_buf)
