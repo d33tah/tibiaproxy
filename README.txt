@@ -72,21 +72,17 @@ Bugs, problems
 ==============
 
 Currently, only a small fraction of the Tibia protocol is implemented and none
-of the features are guaranteed to work. At the moment of writing this
-document, the proxy tries to forward the modified character list, but it's
-broken - only tested on Forgotten Server with a single character. The proxy
-will not notify the user if the credentials are invalid, but will crash
-instead. The game proxying works, but will crash from time to time due to
-assertion errors related to packet length.
+of the features are guaranteed to work. The target hostname is hardcoded and
+the proxy will only let the user connect to the game server specified in the
+configuration file. Also, I received reports about bot lagging under Windows.
 
 TO-DO list
 ==========
 
 * clean up the code related to packet building, fix the padding code
-* fix bug related to > 1 character
-* notify the user if the login/password are incorrect
 * investigate why sometimes the server message has incorrect length
 * properly read the game server IP based on character name, not config.py
+* investigate the Windows lagging problem
 
 In the far future, there is a plan to add some record-and-replay/scripting
 capabilities and port the proxy to the latest Tibia protocol.
