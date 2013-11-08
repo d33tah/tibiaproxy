@@ -162,7 +162,9 @@ class Server:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
             if conn in has_data:
+                start = time.time()
                 data = conn.recv(1024)
+                recv_time = time.time() - start
                 if data == '':
                     log("The client disconnected")
                     break
@@ -211,16 +213,22 @@ class Server:
                     conn.send(sendmsg.getBuffer(0))
                 else:
                     # Otherwise, just pass the packet to the server.
+                    before_send = time.time() - start
                     dest_s.send(data)
+                    log("client->server latency: %f [recv took %f, send took %s]" % (float(time.time() - start), float(recv_time), float(before_send)))
             if dest_s in has_data:
                 # Server sent us some data. Currently, no parsing is done -
                 # just pass it to the player.
+                start = time.time()
                 data = dest_s.recv(1024)
+                recv_time = time.time() - start
                 if data == '':
                     conn.close()
                     log("The server disconnected")
                     break
+                before_send = time.time() - start
                 conn.send(data)
+                log("server->client latency: %f [recv took %f, send took %s]" % (float(time.time() - start), float(recv_time), float(before_send)))
 
     def serveLogin(self):
         """Listen for login server connections and handle them.
