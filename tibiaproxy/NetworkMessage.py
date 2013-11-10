@@ -142,14 +142,6 @@ class NetworkMessage:
         ret_encrypted =  struct.pack("<I", checksum) + ret_encrypted
         return struct.pack("<H", len(ret_encrypted)) + ret_encrypted
 
-    def getBuffer(self, substract):
-        """Returns the whole buffer of the network message, along with its size
-        prepended to the returned string, without affecting the inner buffer.
-
-        Returns str
-        """
-        return struct.pack("<H", len(self.buf) - substract) + self.buf
-
     def getRaw(self):
         """Returns the raw buffer without any additional headers.
 
