@@ -16,7 +16,7 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
-from NetworkMessage import NetworkMessage, adlerChecksum
+from NetworkMessage import NetworkMessage
 from LoginProtocol import LoginProtocol
 import XTEA
 from util import *
@@ -201,11 +201,7 @@ class Server:
                     sendmsg.addByte(7)
                     sendmsg.writable = True
                     sendmsg.addString(to_send)
-                    sendmsg_buf = XTEA.XTEA_encrypt(sendmsg.getBuffer(0), xtea_key)
-                    sendmsg = NetworkMessage(sendmsg_buf)
-                    checksum = adlerChecksum(sendmsg.getRaw())
-                    sendmsg.prependU32(checksum)
-                    conn.send(sendmsg.getBuffer(0))
+                    conn.send(sendmsg.getEncrypted(xtea_key))
                 else:
                     # Otherwise, just pass the packet to the server.
                     dest_s.send(data)
