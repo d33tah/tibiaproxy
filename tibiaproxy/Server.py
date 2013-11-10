@@ -186,10 +186,6 @@ class Server:
                         to_send = str(eval(player_said[1:].lstrip()))
                     except Exception, e:
                         to_send = str(e)
-                    pad = 8 - (len(to_send)+4 & 7)
-                    for i in range(pad):
-                        # FIXME: this is NOT the right way to add padding!
-                        to_send += ' '
                     sendmsg = NetworkMessage()
                     sendmsg.addByte(0xAA)
                     sendmsg.addU32(3)  # statement ID
