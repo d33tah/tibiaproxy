@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
 import struct
+import XTEA
 
 
 def adlerChecksum(buf):
@@ -119,6 +120,27 @@ class NetworkMessage:
         Returns str
         """
         return self.buf[self.pos:]
+
+    def getEncrypted(self, xtea_key):
+        """Returns the network message in a form ready to be sent over the
+        wire. Adds all the necessary headers, encryption and checksums.
+
+        Args:
+            xtea_key (list): XTEA key; a four-element-long array of integers
+
+        Returns str
+        """
+        ret = self.buf
+        # Add the padding
+        size = len(ret)
+        for i in range(8 - (size) % 8):
+           ret += "%c" % 0x33
+
+        ret_with_size = struct.pack("<H", size) + ret
+        ret_encrypted = XTEA.XTEA_encrypt(ret_with_size, xtea_key)
+        checksum = adlerChecksum(ret_encrypted)
+        ret_encrypted =  struct.pack("<I", checksum) + ret_encrypted
+        return struct.pack("<H", len(ret_encrypted)) + ret_encrypted
 
     def getBuffer(self, substract):
         """Returns the whole buffer of the network message, along with its size

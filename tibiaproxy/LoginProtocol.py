@@ -118,7 +118,7 @@ class LoginProtocol:
 
         return ret
 
-    def prepareReply(self, login_reply, xtea_key):
+    def prepareReply(self, login_reply):
         """Prepare the reply based on a LoginReply instance.
 
         Args:
@@ -149,11 +149,4 @@ class LoginProtocol:
             ret.addString(char.name)
         ret.addByte(0x00)
         ret.addByte(0x00)
-        # FIXME: This is probably wrong. See what's the right way and keep in
-        # mind that getBuffer makes the buffer temporarily larger.
-        substract = 0
-        for i in range(8 - ((len(ret.getBuffer(0))) % 8)):
-            substract += 1
-            ret.addByte(0x33)
-        ret_buf = XTEA.XTEA_encrypt(ret.getBuffer(substract), xtea_key)
-        return NetworkMessage(ret_buf)
+        return ret

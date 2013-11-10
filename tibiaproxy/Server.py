@@ -100,12 +100,9 @@ class Server:
         for world in client_reply.worlds:
             world.hostname = self.announce_host
             world.port = self.announce_port
-        client_reply_msg = proto.prepareReply(client_reply, xtea_key)
-        checksum = adlerChecksum(client_reply_msg.getRaw())
-        client_reply_msg.prependU32(checksum)
-
+        client_reply_msg = proto.prepareReply(client_reply)
         # Send the message and close the connection.
-        conn.send(client_reply_msg.getBuffer(0))
+        conn.send(client_reply_msg.getEncrypted(xtea_key))
         conn.close()
 
     def handleGame(self, conn):
