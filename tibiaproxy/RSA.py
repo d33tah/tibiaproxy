@@ -48,6 +48,13 @@ d = toint("""
 88641700821735345222087940578381210879116823013776808975766851829020659073
 """)
 
+tibia_n = toint("""
+132127743205872284062295099082293384952776326496165507967876361843343953435544
+496682053323833394351797728954155097012103928360786959821132214473291575712138
+800495033169914814069637740318278150290733684032524174782740134357629699062987
+023311132821016569775488792221429527047321331896351555606801473202394175817
+""")
+
 
 def buf_to_int(buf):
     """Converts the given buffer to a decimal form, ready for RSA operations.
@@ -102,14 +109,15 @@ def RSA_decrypt(c_bin):
     return int_to_buf(pow(buf_to_int(c_bin), d, p*q))
 
 
-def RSA_encrypt(m_bin):
-    """Encrypts a message using RSA algorithm with an OpenTibia key.
+def RSA_encrypt(m_bin, n=tibia_n):
+    """Encrypts a message using RSA algorithm with a key from the second
+    argument (defaults to real Tibia key version 8.61+).
 
     Args:
         m_bin (str): the message to be encrypted
-        n (int): the public key used for encryption
+        n (int): the public key used for encryption (default to real Tibia key)
 
     Return str
     """
     # return c = m^e mod n, where e = 65537
-    return int_to_buf(pow(buf_to_int(m_bin), 65537, p*q))
+    return int_to_buf(pow(buf_to_int(m_bin), 65537, n))
