@@ -121,12 +121,9 @@ class NetworkMessage:
         """
         return self.buf[self.pos:]
 
-    def getEncrypted(self, xtea_key):
-        """Returns the network message in a form ready to be sent over the
-        wire. Adds all the necessary headers, encryption and checksums.
-
-        Args:
-            xtea_key (list): XTEA key; a four-element-long array of integers
+    def getWithHeader(self):
+        """Returns the unencrypted buffer for the network message with the
+        required padding and size header, ready for XTEA encryption.
 
         Returns str
         """
@@ -137,7 +134,19 @@ class NetworkMessage:
            ret += "%c" % 0x33
 
         ret_with_size = struct.pack("<H", size) + ret
-        ret_encrypted = XTEA.XTEA_encrypt(ret_with_size, xtea_key)
+        return ret_with_size
+
+
+    def getEncrypted(self, xtea_key):
+        """Returns the network message in a form ready to be sent over the
+        wire. Adds all the necessary headers, encryption and checksums.
+
+        Args:
+            xtea_key (list): XTEA key; a four-element-long array of integers
+
+        Returns str
+        """
+        ret_encrypted = XTEA.XTEA_encrypt(self.getWithHeader(), xtea_key)
         checksum = adlerChecksum(ret_encrypted)
         ret_encrypted =  struct.pack("<I", checksum) + ret_encrypted
         return struct.pack("<H", len(ret_encrypted)) + ret_encrypted
