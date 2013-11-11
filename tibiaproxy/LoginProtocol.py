@@ -84,7 +84,7 @@ class LoginProtocol:
 
         msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
         msg = NetworkMessage(msg_buf)
-        #assert(len(msg.getBuffer()) == size)
+        #assert(len(msg.getWithHeader()) == size)
         decrypted_size = msg.getU16()
         #assert(decrypted_size == size - 5)
 
