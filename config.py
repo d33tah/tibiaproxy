@@ -1,3 +1,5 @@
+real_tibia = False
+
 # The login server address and port number the proxy has to connect to.
 destination_login_host = '127.0.0.1'
 destination_login_port = '7172'

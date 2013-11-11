@@ -31,5 +31,6 @@ if __name__ == '__main__':
                listen_game_host=config.listen_game_host,
                listen_game_port=config.listen_game_port,
                announce_host=config.announce_host,
-               announce_port=config.announce_port)
+               announce_port=config.announce_port,
+               real_tibia=config.real_tibia)
     s.run()

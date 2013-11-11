@@ -38,7 +38,7 @@ class Server:
                  destination_game_host, destination_game_port,
                  listen_login_host, listen_login_port,
                  listen_game_host, listen_game_port,
-                 announce_host, announce_port):
+                 announce_host, announce_port, real_tibia):
         self.destination_login_host = destination_login_host
         self.destination_login_port = int(destination_login_port)
         self.destination_game_host = destination_game_host
@@ -49,6 +49,7 @@ class Server:
         self.listen_game_port = int(listen_game_port)
         self.announce_host = announce_host
         self.announce_port = int(announce_port)
+        self.real_tibia = real_tibia
 
         # Try to request the TCP port from the operating system. Tell it that
         # it is going to be a reusable port, so that a sudden crash of the
@@ -80,7 +81,10 @@ class Server:
         log("Connecting to the destination host...")
         dest_s.connect((self.destination_login_host,
                         self.destination_login_port))
-        dest_s.send(msg.getRaw())
+        if not self.real_tibia:
+            dest_s.send(msg.getRaw())
+        else:
+            assert(False)  # TODO: actually implement it.
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
         reply = proto.parseReply(msg, xtea_key)
