@@ -49,18 +49,45 @@ d = toint("""
 """)
 
 
-def byte_to_hex(i):
-    """Convert a character to the hexadecimal form, padding it with spaces.
+def buf_to_int(buf):
+    """Converts the given buffer to a decimal form, ready for RSA operations.
 
     Args:
-        i (str): the character to be converted
+        buf (str): the buffer to be converted
 
-    Returns str
+    Returns int
     """
-    without_0x = hex(ord(i)).replace('0x', '')
-    space_padded = "%2s" % without_0x
-    zero_padded = space_padded.replace(' ', '0')
-    return zero_padded
+    # first, convert each character to hexadecimal.
+    zero_padded = ""
+    for i in buf:
+        without_0x = hex(ord(i)).replace('0x', '')
+        space_padded = "%2s" % without_0x
+        zero_padded += space_padded.replace(' ', '0')
+
+    # convert each byte to hex, then join it together and convert to int
+    return int(zero_padded, 16)
+
+
+def int_to_buf(num):
+    """Converts the given buffer to a decimal form, ready for RSA operations.
+
+    Args:
+        buf (str): the buffer to be converted
+
+    Returns int
+    """
+    # convert the string to hexadecimal
+    num_hex = "%x" % num
+    if len(num_hex) % 2 != 0:
+        num_hex = "0" + num_hex
+
+    # Now, convert the hexadecimal form to a binary one.
+    num_bin = ""
+    for i in range(len(num_hex)/2):
+        chunk = num_hex[i*2:(i+1)*2]
+        num_bin += chr(int(chunk, 16))
+
+    return num_bin
 
 
 def RSA_decrypt(c_bin):
@@ -71,48 +98,18 @@ def RSA_decrypt(c_bin):
 
     Returns str
     """
-    c_hex = ''.join([byte_to_hex(i) for i in c_bin])
+    # return z = c^d % n. pow(c,d,n) is way faster than z = c**d % n.
+    return int_to_buf(pow(buf_to_int(c_bin), d, p*q))
 
-    c = int(c_hex, 16)
-
-    n = p*q
-    # z = c^d % n, way faster than z = c**d % n
-    z = pow(c, d, n)
-
-    z_hex = "%x" % z
-    if len(z_hex) % 2 != 0:
-        z_hex = "0" + z_hex
-
-    # Now, convert the hexadecimal form to a binary one.
-    z_bin = ""
-    for i in range(len(z_hex)/2):
-        chunk = z_hex[i*2:(i+1)*2]
-        z_bin += chr(int(chunk, 16))
-
-    return z_bin
 
 def RSA_encrypt(m_bin):
     """Encrypts a message using RSA algorithm with an OpenTibia key.
 
     Args:
         m_bin (str): the message to be encrypted
+        n (int): the public key used for encryption
 
     Return str
     """
-    m_hex = ''.join([byte_to_hex(i) for i in m_bin])
-
-    m = int(m_hex, 16)
-
-    n = p*q
-    c = pow(m, 65537, n)
-
-    c_hex = "%x" % c
-    if len(c_hex) % 2 != 0:
-        c_hex = "0" + c_hex
-
-    c_bin = ""
-    for i in range(len(c_hex)/2):
-        chunk = c_hex[i*2:(i+1)*2]
-        c_bin += chr(int(chunk, 16))
-
-    return c_bin
+    # return c = m^e mod n, where e = 65537
+    return int_to_buf(pow(buf_to_int(m_bin), 65537, p*q))
