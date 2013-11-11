@@ -90,3 +90,29 @@ def RSA_decrypt(c_bin):
         z_bin += chr(int(chunk, 16))
 
     return z_bin
+
+def RSA_encrypt(m_bin):
+    """Encrypts a message using RSA algorithm with an OpenTibia key.
+
+    Args:
+        m_bin (str): the message to be encrypted
+
+    Return str
+    """
+    m_hex = ''.join([byte_to_hex(i) for i in m_bin])
+
+    m = int(m_hex, 16)
+
+    n = p*q
+    c = pow(m, 65537, n)
+
+    c_hex = "%x" % c
+    if len(c_hex) % 2 != 0:
+        c_hex = "0" + c_hex
+
+    c_bin = ""
+    for i in range(len(c_hex)/2):
+        chunk = c_hex[i*2:(i+1)*2]
+        c_bin += chr(int(chunk, 16))
+
+    return c_bin
