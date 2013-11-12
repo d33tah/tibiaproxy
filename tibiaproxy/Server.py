@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 from NetworkMessage import NetworkMessage
 from LoginProtocol import LoginProtocol
 import XTEA
+import RSA
 from util import *
 
 import select
@@ -84,7 +85,8 @@ class Server:
         if not self.real_tibia:
             dest_s.send(msg.getRaw())
         else:
-            assert(False)  # TODO: actually implement it.
+            reencrypted = RSA.RSA_encrypt(RSA.RSA_decrypt(msg.getRaw()[28:]))
+            dest_s.send(msg.getRaw()[:28] + reencrypted)
         data = dest_s.recv(1024)
         msg = NetworkMessage(data)
         reply = proto.parseReply(msg, xtea_key)
