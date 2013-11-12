@@ -131,11 +131,10 @@ class NetworkMessage:
         # Add the padding
         size = len(ret)
         for i in range(8 - (size) % 8):
-           ret += "%c" % 0x33
+            ret += "%c" % 0x33
 
         ret_with_size = struct.pack("<H", size) + ret
         return ret_with_size
-
 
     def getEncrypted(self, xtea_key):
         """Returns the network message in a form ready to be sent over the
@@ -148,7 +147,7 @@ class NetworkMessage:
         """
         ret_encrypted = XTEA.XTEA_encrypt(self.getWithHeader(), xtea_key)
         checksum = adlerChecksum(ret_encrypted)
-        ret_encrypted =  struct.pack("<I", checksum) + ret_encrypted
+        ret_encrypted = struct.pack("<I", checksum) + ret_encrypted
         return struct.pack("<H", len(ret_encrypted)) + ret_encrypted
 
     def getRaw(self):

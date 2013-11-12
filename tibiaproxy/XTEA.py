@@ -85,6 +85,7 @@ def XTEA_encrypt(buf, k):
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
     return ret
 
+
 def XTEA_decrypt(buf, k):
     """Decrypts a given message using the given key.
 
