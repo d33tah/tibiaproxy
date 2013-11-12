@@ -1,3 +1,4 @@
+# Whether to use real Tibia (True) encryption or OpenTibia encryption (False).
 real_tibia = False
 
 # The login server address and port number the proxy has to connect to.
