@@ -236,7 +236,8 @@ class Server:
             log("Received a login connection from %s:%s" % addr)
             data = conn.recv(1024)
             msg = NetworkMessage(data)
-            self.handleLogin(conn, msg)
+            t = threading.Thread(target=self.handleLogin, args=[conn, msg])
+            t.start()
 
     def serveGame(self):
         """Listen for game server connections and handle them.
@@ -246,7 +247,8 @@ class Server:
         while True:
             conn, addr = self.g_s.accept()
             log("Received a game server connection from %s:%s" % addr)
-            self.handleGame(conn)
+            t = threading.Thread(target=self.handleGame, args=[conn])
+            t.start()
 
     def run(self):
         """Run serveLogin and serveGame threads and sleep forever.
