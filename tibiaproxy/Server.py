@@ -142,8 +142,6 @@ class Server:
         dest_s.connect((self.destination_game_host,
                         self.destination_game_port))
         buf = dest_s.recv(1024)
-        #print("gameHelloBuf=%s" % repr(buf))
-        #conn.send('\x0c\x00\xd9\x02\xaa\t\x06\x00\x1f\xefYvR\xa3')
         conn.send(buf)
 
         data = conn.recv(2)
