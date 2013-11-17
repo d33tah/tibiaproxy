@@ -60,4 +60,11 @@ class GameProtocol:
         msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
         msg = NetworkMessage(msg_buf)
         # Extract the XTEA keys from the RSA-decrypted message.
-        return [msg.getU32() for i in range(4)]
+        keys = [msg.getU32() for i in range(4)]
+        assert(msg.getByte() == 0)  # gamemaster flag
+        msg.getString()  # account
+        msg.getString()  # character name
+        msg.getString()  # password
+        timestamp = msg.getU32()
+        random_number = msg.getByte()
+        return keys
