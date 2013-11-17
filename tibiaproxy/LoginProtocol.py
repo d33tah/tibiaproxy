@@ -97,22 +97,21 @@ class LoginProtocol:
         assert(msg.getByte() == 0x64)
 
         num_worlds = msg.getByte()
-        assert(num_worlds == 1)  # more is currently not supported.
-        world = LoginWorldEntry()
-        world_id = msg.getByte()
-        world.name = msg.getString()
-        world.hostname = msg.getString()
-        world.port = msg.getU16()
-        log("Received server address %s:%s" % (world.hostname, world.port))
-        msg.skipBytes(1)  # no idea what's that.
-        ret.worlds += [world]
+        for i in range(num_worlds):
+            world = LoginWorldEntry()
+            world_id = msg.getByte()
+            world.name = msg.getString()
+            world.hostname = msg.getString()
+            world.port = msg.getU16()
+            log("Received server address %s:%s" % (world.hostname, world.port))
+            msg.skipBytes(1)  # no idea what's that.
+            ret.worlds += [world]
 
         num_chars = msg.getByte()
         for i in range(num_chars):
             char = LoginCharacterEntry()
             world_num = msg.getByte()
-            assert(world_num == 0)
-            char.world = world
+            char.world = ret.worlds[world_num]
             char.name = msg.getString()
             ret.characters += [char]
 
