@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 from NetworkMessage import NetworkMessage, adlerChecksum
 from LoginProtocol import LoginProtocol
+from GameProtocol import GameProtocol
 import XTEA
 import RSA
 from util import *
@@ -141,8 +142,15 @@ class Server:
             self.destination_game_host, self.destination_game_port))
         dest_s.connect((self.destination_game_host,
                         self.destination_game_port))
-        buf = dest_s.recv(1024)
-        conn.send(buf)
+        size_raw = dest_s.recv(2)
+        size = struct.unpack("<H", size_raw)[0]
+        checksum = dest_s.recv(4)
+        data = dest_s.recv(size)
+        msg = NetworkMessage(data)
+
+        proto = GameProtocol()
+        proto.parseFirstMessage(msg)
+        conn.send(size_raw+checksum+data)
 
         data = conn.recv(2)
         size = struct.unpack("<H", data)[0]
