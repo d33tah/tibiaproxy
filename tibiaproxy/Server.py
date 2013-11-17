@@ -149,7 +149,7 @@ class Server:
         msg = NetworkMessage(data)
 
         proto = GameProtocol()
-        proto.parseFirstMessage(msg)
+        proto.parseChallengeMessage(msg)
         conn.send(size_raw+checksum+data)
 
         data = conn.recv(2)
@@ -158,7 +158,7 @@ class Server:
 
         # Read the XTEA key from the player, pass on the original packet.
         msg = NetworkMessage(data)
-        xtea_key = LoginProtocol().parseFirstMessage(msg, 16)
+        xtea_key = proto.parseFirstMessage(msg)
         dest_s.send(data)
 
         # You might not know this trick.

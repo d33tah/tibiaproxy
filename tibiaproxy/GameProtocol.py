@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
 from NetworkMessage import NetworkMessage
+import RSA
 
 
 class HandshakeChallenge:
@@ -32,7 +33,7 @@ class HandshakeChallenge:
 class GameProtocol:
     """Handles building and parsing the login protocol network messages."""
 
-    def parseFirstMessage(self, msg):
+    def parseChallengeMessage(self, msg):
         """Parse the first (server's) message from the game protocol.
 
         Args:
@@ -46,3 +47,17 @@ class GameProtocol:
         random_number = msg.getByte()
         ret = HandshakeChallenge(timestamp, random_number)
         return ret
+
+    def parseFirstMessage(self, msg):
+        """Parse the first (client's) message from the game protocol.
+
+        Args:
+            msg (NetworkMessage): the network message to be parsed.
+
+        Returns list
+        """
+        msg.skipBytes(16)
+        msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
+        msg = NetworkMessage(msg_buf)
+        # Extract the XTEA keys from the RSA-decrypted message.
+        return [msg.getU32() for i in range(4)]

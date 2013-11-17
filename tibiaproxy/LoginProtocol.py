@@ -52,7 +52,7 @@ class LoginReply:
 class LoginProtocol:
     """Handles building and parsing the login protocol network messages."""
 
-    def parseFirstMessage(self, msg, skip_bytes=28):
+    def parseFirstMessage(self, msg):
         """Parse the first (client's) message from the login protocol.
 
         Args:
@@ -61,7 +61,7 @@ class LoginProtocol:
 
         Returns list
         """
-        msg.skipBytes(skip_bytes)
+        msg.skipBytes(28)
         msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
         msg = NetworkMessage(msg_buf)
         # Extract the XTEA keys from the RSA-decrypted message.
