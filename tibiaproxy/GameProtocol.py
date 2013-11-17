@@ -1,5 +1,5 @@
 """
-LoginProtocol.py - contains classes needed to handle the login protocol.
+GameProtocol.py - contains classes needed to handle the game protocol.
 """
 
 """
