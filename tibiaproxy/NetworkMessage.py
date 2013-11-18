@@ -224,3 +224,10 @@ class NetworkMessage:
         """
         self.buf += struct.pack("<H", len(_str))
         self.buf += _str
+
+    def getPos(self):
+        """Returns the current position in the buffer
+
+        Returns int
+        """
+        return self.pos
