@@ -63,7 +63,7 @@ class NetworkMessage:
         Args:
             buf (str): the initial buffer.
         """
-        self.buf = buf or ""
+        self.buf = bytearray(buf) if buf is not None else bytearray()
         self.pos = 0
 
     def getByte(self):
@@ -73,7 +73,7 @@ class NetworkMessage:
         """
         ret = self.buf[self.pos]
         self.pos += 1
-        return ord(ret)
+        return ret
 
     def getU32(self):
         """Returns the next unprocessed unsigned 32-bit integer.
@@ -101,7 +101,7 @@ class NetworkMessage:
         size = self.getU16()
         ret = self.buf[self.pos:self.pos+size]
         self.pos += size
-        return ret
+        return str(ret)
 
     def skipBytes(self, _bytes):
         """Skips a number of bytes from the network message.

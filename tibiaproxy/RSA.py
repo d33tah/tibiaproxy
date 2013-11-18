@@ -67,7 +67,7 @@ def buf_to_int(buf):
     # first, convert each character to hexadecimal.
     zero_padded = ""
     for i in buf:
-        without_0x = hex(ord(i)).replace('0x', '')
+        without_0x = hex(i).replace('0x', '')
         space_padded = "%2s" % without_0x
         zero_padded += space_padded.replace(' ', '0')
 
