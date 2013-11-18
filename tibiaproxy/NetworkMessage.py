@@ -231,3 +231,24 @@ class NetworkMessage:
         Returns int
         """
         return self.pos
+
+    # TODO: this could probably be merged with addU32.
+    def replaceU32(self, u32):
+        """Replaces the U32 at the current position with a given U32.
+
+        Args:
+            u32 (int): the unsigned 16-bit integer to be replaced
+
+        Returns None
+        """
+        self.buf[self.pos:self.pos+4] = struct.pack("<I", u32)
+
+    def replaceByte(self, byte):
+        """Replaces the U32 at the current position with a given U32.
+
+        Args:
+            u32 (int): the unsigned 16-bit integer to be replaced
+
+        Returns None
+        """
+        self.buf[self.pos] = byte
