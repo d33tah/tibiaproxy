@@ -24,10 +24,8 @@ from NetworkMessage import NetworkMessage
 import RSA
 
 
-class HandshakeChallenge:
-    def __init__(self, timestamp, random_number):
-        self.timestamp = timestamp
-        self.random_number = random_number
+def create_handshake_challenge(timestamp, random_number):
+    return {'timestamp': timestamp, 'random_number': random_number }
 
 
 class GameProtocol:
@@ -45,8 +43,7 @@ class GameProtocol:
         assert(msg.getByte() == 0x1F)
         timestamp = msg.getU32()
         random_number = msg.getByte()
-        ret = HandshakeChallenge(timestamp, random_number)
-        return ret
+        return create_handshake_challenge(timestamp, random_number)
 
     def parseFirstMessage(self, msg):
         """Parse the first (client's) message from the game protocol.
