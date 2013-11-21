@@ -25,7 +25,8 @@ import RSA
 
 
 def create_handshake_challenge(timestamp, random_number):
-    return {'timestamp': timestamp, 'random_number': random_number }
+    return {'timestamp': timestamp, 'random_number': random_number}
+
 
 def create_handshake_reply(xtea_key, account_number, password, character_name,
                            timestamp, random_number, challenge_pos, first_16,
@@ -40,6 +41,7 @@ def create_handshake_reply(xtea_key, account_number, password, character_name,
             'first_16': first_16,
             'decrypted_raw': decrypted_raw}
 
+
 def parseChallengeMessage(msg):
     """Parse the first (server's) message from the game protocol.
 
@@ -53,6 +55,7 @@ def parseChallengeMessage(msg):
     timestamp = msg.getU32()
     random_number = msg.getByte()
     return create_handshake_challenge(timestamp, random_number)
+
 
 def parseFirstMessage(orig_msg):
     """Parse the first (client's) message from the game protocol.
@@ -74,12 +77,12 @@ def parseFirstMessage(orig_msg):
     challenge_pos = msg.getPos()
     timestamp = msg.getU32()
     random_number = msg.getByte()
-    return create_handshake_reply(xtea_key = xtea_key,
-                                  account_number = account_number,
-                                  password = password,
-                                  character_name = character_name,
-                                  timestamp = timestamp,
-                                  random_number = random_number,
-                                  challenge_pos = challenge_pos,
-                                  first_16 = orig_msg.getRaw()[:16],
-                                  decrypted_raw = msg_buf)
+    return create_handshake_reply(xtea_key=xtea_key,
+                                  account_number=account_number,
+                                  password=password,
+                                  character_name=character_name,
+                                  timestamp=timestamp,
+                                  random_number=random_number,
+                                  challenge_pos=challenge_pos,
+                                  first_16=orig_msg.getRaw()[:16],
+                                  decrypted_raw=msg_buf)

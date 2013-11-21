@@ -29,11 +29,14 @@ from util import *
 def create_login_world_entry(name, hostname, port):
     return {'name': name, 'hostname': hostname, 'port': port}
 
+
 def create_login_character_entry(name, world):
     return {'name': name, 'world': world}
 
+
 def create_login_reply_info(characters, motd, worlds):
     return {'characters': characters, 'motd': motd, 'worlds': worlds}
+
 
 def parseFirstMessage(msg):
     """Parse the first (client's) message from the login protocol.
@@ -49,6 +52,7 @@ def parseFirstMessage(msg):
     msg = NetworkMessage(msg_buf)
     # Extract the XTEA keys from the RSA-decrypted message.
     return [msg.getU32() for i in range(4)]
+
 
 def parseReply(msg, xtea_key):
     """Parse the reply from the login server.
@@ -100,6 +104,7 @@ def parseReply(msg, xtea_key):
                                                     world=char_world)]
 
     return create_login_reply_info(characters, motd, worlds)
+
 
 def prepareReply(login_reply):
     """Prepare the reply based on a LoginReply instance.
