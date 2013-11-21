@@ -26,28 +26,14 @@ import XTEA
 from util import *
 
 
-class LoginWorldEntry:
-    """Describes a single world list item."""
-    def __init__(self):
-        self.name = ""
-        self.hostname = ""
-        self.port = 0
+def create_login_world_entry(name, hostname, port):
+    return {'name': name, 'hostname': hostname, 'port': port}
 
+def create_login_character_entry(name, world):
+    return {'name': name, 'world': world}
 
-class LoginCharacterEntry:
-    """Describes a single character list item."""
-    def __init__(self):
-        self.name = ""
-        self.world = None
-
-
-class LoginReply:
-    """Describes a login protocol reply."""
-    def __init__(self):
-        self.motd = ""
-        self.characters = []
-        self.worlds = []
-
+def create_login_reply_info(characters, motd, worlds):
+    return {'characters': characters, 'motd': motd, 'worlds': worlds}
 
 def parseFirstMessage(msg):
     """Parse the first (client's) message from the login protocol.
@@ -72,8 +58,6 @@ def parseReply(msg, xtea_key):
 
     Returns LoginReply or None
     """
-    ret = LoginReply()
-
     size = msg.getU16()
 
     # someday perhaps I'll have enough time to even check the checksums!
@@ -89,30 +73,33 @@ def parseReply(msg, xtea_key):
     if packet_type != 0x14:
         # The reply doesn't seem to contain character list.
         return None
-    ret.motd = msg.getString()
+    motd = msg.getString()
 
     assert(msg.getByte() == 0x64)
 
     num_worlds = msg.getByte()
+    worlds = []
     for i in range(num_worlds):
-        world = LoginWorldEntry()
         world_id = msg.getByte()
-        world.name = msg.getString()
-        world.hostname = msg.getString()
-        world.port = msg.getU16()
-        log("Received server address %s:%s" % (world.hostname, world.port))
+        world_name = msg.getString()
+        world_hostname = msg.getString()
+        world_port = msg.getU16()
+        log("Received server address %s:%s" % (world_hostname, world_port))
         msg.skipBytes(1)  # no idea what's that.
-        ret.worlds += [world]
+        worlds += [create_login_world_entry(name=world_name,
+                                            hostname=world_hostname,
+                                            port=world_port)]
 
     num_chars = msg.getByte()
+    characters = []
     for i in range(num_chars):
-        char = LoginCharacterEntry()
         world_num = msg.getByte()
-        char.world = ret.worlds[world_num]
-        char.name = msg.getString()
-        ret.characters += [char]
+        char_world = worlds[world_num]
+        char_name = msg.getString()
+        characters += [create_login_character_entry(name=char_name,
+                                                    world=char_world)]
 
-    return ret
+    return create_login_reply_info(characters, motd, worlds)
 
 def prepareReply(login_reply):
     """Prepare the reply based on a LoginReply instance.
@@ -126,23 +113,23 @@ def prepareReply(login_reply):
 
     ret = NetworkMessage()
     ret.addByte(0x14)
-    ret.addString(login_reply.motd)
+    ret.addString(login_reply['motd'])
     ret.addByte(0x64)
 
-    ret.addByte(len(login_reply.worlds))
+    ret.addByte(len(login_reply['worlds']))
     world_id = 0
-    for world in login_reply.worlds:
+    for world in login_reply['worlds']:
         ret.addByte(world_id)
-        ret.addString(world.name)
-        ret.addString(world.hostname)
-        ret.addU16(world.port)
+        ret.addString(world['name'])
+        ret.addString(world['hostname'])
+        ret.addU16(world['port'])
         ret.addByte(0)
         world_id += 1
 
-    ret.addByte(len(login_reply.characters))
-    for char in login_reply.characters:
-        ret.addByte(login_reply.worlds.index(char.world))
-        ret.addString(char.name)
+    ret.addByte(len(login_reply['characters']))
+    for char in login_reply['characters']:
+        ret.addByte(login_reply['worlds'].index(char['world']))
+        ret.addString(char['name'])
     ret.addByte(0x00)
     ret.addByte(0x00)
     return ret

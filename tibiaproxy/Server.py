@@ -112,9 +112,10 @@ class Server:
         # TODO: save the original IP addresses in a dictionary so that game
         # server IPs different than the login server IP.
         client_reply = copy.copy(reply)
-        for world in client_reply.worlds:
-            world.hostname = self.announce_host
-            world.port = self.announce_port
+        for world in client_reply['worlds']:
+            print(world)
+            world['hostname'] = self.announce_host
+            world['port'] = self.announce_port
         client_reply_msg = LoginProtocol.prepareReply(client_reply)
         # Send the message and close the connection.
         conn.send(client_reply_msg.getEncrypted(xtea_key))
