@@ -158,7 +158,8 @@ class Server:
 
         # Read the XTEA key from the player, pass on the original packet.
         msg = NetworkMessage(data)
-        xtea_key = proto.parseFirstMessage(msg)
+        firstmsg_contents = proto.parseFirstMessage(msg)
+        xtea_key = firstmsg_contents['xtea_key']
         dest_s.send(data)
 
         # You might not know this trick.

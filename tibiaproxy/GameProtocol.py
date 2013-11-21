@@ -27,6 +27,18 @@ import RSA
 def create_handshake_challenge(timestamp, random_number):
     return {'timestamp': timestamp, 'random_number': random_number }
 
+def create_handshake_reply(xtea_key, account_number, password, character_name,
+                           timestamp, random_number, challenge_pos, first_16,
+                           decrypted_raw):
+    return {'xtea_key': xtea_key,
+            'account_number': account_number,
+            'password': password,
+            'character_name': character_name,
+            'timestamp': timestamp,
+            'random_number': random_number,
+            'challenge_pos': challenge_pos,
+            'first_16': first_16,
+            'decrypted_raw': decrypted_raw}
 
 class GameProtocol:
     """Handles building and parsing the login protocol network messages."""
@@ -45,23 +57,32 @@ class GameProtocol:
         random_number = msg.getByte()
         return create_handshake_challenge(timestamp, random_number)
 
-    def parseFirstMessage(self, msg):
+    def parseFirstMessage(self, orig_msg):
         """Parse the first (client's) message from the game protocol.
 
         Args:
-            msg (NetworkMessage): the network message to be parsed.
+            orig_msg (NetworkMessage): the network message to be parsed.
 
         Returns list
         """
-        msg.skipBytes(16)
-        msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
+        orig_msg.skipBytes(16)
+        msg_buf = RSA.RSA_decrypt(orig_msg.getRest()[:128])
         msg = NetworkMessage(msg_buf)
         # Extract the XTEA keys from the RSA-decrypted message.
-        keys = [msg.getU32() for i in range(4)]
-        assert(msg.getByte() == 0)  # gamemaster flag
-        msg.getString()  # account
-        msg.getString()  # character name
-        msg.getString()  # password
+        xtea_key = [msg.getU32() for i in range(4)]
+        assert(msg.getByte() == 0)        # gamemaster flag
+        account_number = msg.getString()  # account
+        character_name = msg.getString()  # character name
+        password = msg.getString()        # password
+        challenge_pos = msg.getPos()
         timestamp = msg.getU32()
         random_number = msg.getByte()
-        return keys
+        return create_handshake_reply(xtea_key = xtea_key,
+                                      account_number = account_number,
+                                      password = password,
+                                      character_name = character_name,
+                                      timestamp = timestamp,
+                                      random_number = random_number,
+                                      challenge_pos = challenge_pos,
+                                      first_16 = orig_msg.getRaw()[:16],
+                                      decrypted_raw = msg_buf)
