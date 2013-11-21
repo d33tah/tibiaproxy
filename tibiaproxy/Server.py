@@ -159,7 +159,7 @@ class Server:
         msg = NetworkMessage(data)
         firstmsg_contents = GameProtocol.parseFirstMessage(msg)
         xtea_key = firstmsg_contents['xtea_key']
-        dest_s.send(data)
+        dest_s.send(GameProtocol.prepareReply(firstmsg_contents))
 
         # You might not know this trick.
         #

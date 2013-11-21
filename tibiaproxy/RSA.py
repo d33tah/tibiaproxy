@@ -48,6 +48,8 @@ d = toint("""
 88641700821735345222087940578381210879116823013776808975766851829020659073
 """)
 
+otserv_n = p * q
+
 tibia_n = toint("""
 132127743205872284062295099082293384952776326496165507967876361843343953435544
 496682053323833394351797728954155097012103928360786959821132214473291575712138
@@ -106,7 +108,7 @@ def RSA_decrypt(c_bin):
     Returns str
     """
     # return z = c^d % n. pow(c,d,n) is way faster than z = c**d % n.
-    return int_to_buf(pow(buf_to_int(c_bin), d, p*q))
+    return int_to_buf(pow(buf_to_int(c_bin), d, otserv_n))
 
 
 def RSA_encrypt(m_bin, n=tibia_n):

@@ -85,4 +85,9 @@ def parseFirstMessage(orig_msg):
                                   random_number=random_number,
                                   challenge_pos=challenge_pos,
                                   first_16=orig_msg.getRaw()[:16],
-                                  decrypted_raw=msg_buf)
+                                  decrypted_raw=bytearray(msg_buf))
+
+
+def prepareReply(handshake_reply):
+    return (handshake_reply['first_16'] +
+            RSA.RSA_encrypt(handshake_reply['decrypted_raw'], n=RSA.otserv_n))
