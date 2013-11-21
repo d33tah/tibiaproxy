@@ -62,7 +62,7 @@ def buf_to_int(buf):
     """Converts the given buffer to a decimal form, ready for RSA operations.
 
     Args:
-        buf (str): the buffer to be converted
+        buf (bytearray): the buffer to be converted
 
     Returns int
     """
@@ -81,7 +81,7 @@ def int_to_buf(num):
     """Converts the given buffer to a decimal form, ready for RSA operations.
 
     Args:
-        buf (str): the buffer to be converted
+        buf (bytearray): the buffer to be converted
 
     Returns int
     """
@@ -103,7 +103,7 @@ def RSA_decrypt(c_bin):
     """Decrypts an RSA-encrypted message with an OpenTibia key.
 
     Args:
-        c_bin (str): the message to be decrypted
+        c_bin (bytearray): the message to be decrypted
 
     Returns str
     """
@@ -116,7 +116,7 @@ def RSA_encrypt(m_bin, n=tibia_n):
     argument (defaults to real Tibia key version 8.61+).
 
     Args:
-        m_bin (str): the message to be encrypted
+        m_bin (bytearray): the message to be encrypted
         n (int): the public key used for encryption (default to real Tibia key)
 
     Return str
