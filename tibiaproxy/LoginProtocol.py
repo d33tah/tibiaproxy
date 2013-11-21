@@ -1,5 +1,5 @@
 """
-LoginProtocol.py - contains classes needed to handle the login protocol.
+LoginProtocol.py - contains code needed to handle the login protocol.
 """
 
 """
@@ -49,103 +49,100 @@ class LoginReply:
         self.worlds = []
 
 
-class LoginProtocol:
-    """Handles building and parsing the login protocol network messages."""
+def parseFirstMessage(msg):
+    """Parse the first (client's) message from the login protocol.
 
-    def parseFirstMessage(self, msg):
-        """Parse the first (client's) message from the login protocol.
+    Args:
+        msg (NetworkMessage): the network message to be parsed.
+        skip_bytes (int): the offset at which is the RSA-encrypted message.
 
-        Args:
-            msg (NetworkMessage): the network message to be parsed.
-            skip_bytes (int): the offset at which is the RSA-encrypted message.
+    Returns list
+    """
+    msg.skipBytes(28)
+    msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
+    msg = NetworkMessage(msg_buf)
+    # Extract the XTEA keys from the RSA-decrypted message.
+    return [msg.getU32() for i in range(4)]
 
-        Returns list
-        """
-        msg.skipBytes(28)
-        msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
-        msg = NetworkMessage(msg_buf)
-        # Extract the XTEA keys from the RSA-decrypted message.
-        return [msg.getU32() for i in range(4)]
+def parseReply(msg, xtea_key):
+    """Parse the reply from the login server.
 
-    def parseReply(self, msg, xtea_key):
-        """Parse the reply from the login server.
+    Args:
+        msg (NetworkMessage): the network message to be parsed.
 
-        Args:
-            msg (NetworkMessage): the network message to be parsed.
+    Returns LoginReply or None
+    """
+    ret = LoginReply()
 
-        Returns LoginReply or None
-        """
-        ret = LoginReply()
+    size = msg.getU16()
 
-        size = msg.getU16()
+    # someday perhaps I'll have enough time to even check the checksums!
+    msg.skipBytes(4)
 
-        # someday perhaps I'll have enough time to even check the checksums!
-        msg.skipBytes(4)
+    msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
+    msg = NetworkMessage(msg_buf)
+    #assert(len(msg.getWithHeader()) == size)
+    decrypted_size = msg.getU16()
+    #assert(decrypted_size == size - 5)
 
-        msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
-        msg = NetworkMessage(msg_buf)
-        #assert(len(msg.getWithHeader()) == size)
-        decrypted_size = msg.getU16()
-        #assert(decrypted_size == size - 5)
+    packet_type = msg.getByte()
+    if packet_type != 0x14:
+        # The reply doesn't seem to contain character list.
+        return None
+    ret.motd = msg.getString()
 
-        packet_type = msg.getByte()
-        if packet_type != 0x14:
-            # The reply doesn't seem to contain character list.
-            return None
-        ret.motd = msg.getString()
+    assert(msg.getByte() == 0x64)
 
-        assert(msg.getByte() == 0x64)
+    num_worlds = msg.getByte()
+    for i in range(num_worlds):
+        world = LoginWorldEntry()
+        world_id = msg.getByte()
+        world.name = msg.getString()
+        world.hostname = msg.getString()
+        world.port = msg.getU16()
+        log("Received server address %s:%s" % (world.hostname, world.port))
+        msg.skipBytes(1)  # no idea what's that.
+        ret.worlds += [world]
 
-        num_worlds = msg.getByte()
-        for i in range(num_worlds):
-            world = LoginWorldEntry()
-            world_id = msg.getByte()
-            world.name = msg.getString()
-            world.hostname = msg.getString()
-            world.port = msg.getU16()
-            log("Received server address %s:%s" % (world.hostname, world.port))
-            msg.skipBytes(1)  # no idea what's that.
-            ret.worlds += [world]
+    num_chars = msg.getByte()
+    for i in range(num_chars):
+        char = LoginCharacterEntry()
+        world_num = msg.getByte()
+        char.world = ret.worlds[world_num]
+        char.name = msg.getString()
+        ret.characters += [char]
 
-        num_chars = msg.getByte()
-        for i in range(num_chars):
-            char = LoginCharacterEntry()
-            world_num = msg.getByte()
-            char.world = ret.worlds[world_num]
-            char.name = msg.getString()
-            ret.characters += [char]
+    return ret
 
-        return ret
+def prepareReply(login_reply):
+    """Prepare the reply based on a LoginReply instance.
 
-    def prepareReply(self, login_reply):
-        """Prepare the reply based on a LoginReply instance.
+    Args:
+        login_reply (LoginReply): the login_reply structure used to build
+            the response.
 
-        Args:
-            login_reply (LoginReply): the login_reply structure used to build
-                the response.
+    Returns NetworkMessage
+    """
 
-        Returns NetworkMessage
-        """
+    ret = NetworkMessage()
+    ret.addByte(0x14)
+    ret.addString(login_reply.motd)
+    ret.addByte(0x64)
 
-        ret = NetworkMessage()
-        ret.addByte(0x14)
-        ret.addString(login_reply.motd)
-        ret.addByte(0x64)
+    ret.addByte(len(login_reply.worlds))
+    world_id = 0
+    for world in login_reply.worlds:
+        ret.addByte(world_id)
+        ret.addString(world.name)
+        ret.addString(world.hostname)
+        ret.addU16(world.port)
+        ret.addByte(0)
+        world_id += 1
 
-        ret.addByte(len(login_reply.worlds))
-        world_id = 0
-        for world in login_reply.worlds:
-            ret.addByte(world_id)
-            ret.addString(world.name)
-            ret.addString(world.hostname)
-            ret.addU16(world.port)
-            ret.addByte(0)
-            world_id += 1
-
-        ret.addByte(len(login_reply.characters))
-        for char in login_reply.characters:
-            ret.addByte(login_reply.worlds.index(char.world))
-            ret.addString(char.name)
-        ret.addByte(0x00)
-        ret.addByte(0x00)
-        return ret
+    ret.addByte(len(login_reply.characters))
+    for char in login_reply.characters:
+        ret.addByte(login_reply.worlds.index(char.world))
+        ret.addString(char.name)
+    ret.addByte(0x00)
+    ret.addByte(0x00)
+    return ret

@@ -17,8 +17,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
 from NetworkMessage import NetworkMessage, adlerChecksum
-from LoginProtocol import LoginProtocol
-from GameProtocol import GameProtocol
+import LoginProtocol
+import GameProtocol
 import XTEA
 import RSA
 from util import *
@@ -75,8 +75,7 @@ class Server:
 
         Returns None
         """
-        proto = LoginProtocol()
-        xtea_key = proto.parseFirstMessage(msg)
+        xtea_key = LoginProtocol.parseFirstMessage(msg)
 
         # Connect to the destination host, send the request and read the reply.
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -99,7 +98,7 @@ class Server:
             conn.close()
             return
         msg = NetworkMessage(data)
-        reply = proto.parseReply(msg, xtea_key)
+        reply = LoginProtocol.parseReply(msg, xtea_key)
         if reply is None:
             # The reply doesn't seem to contain character list - just forward
             # it.
@@ -116,7 +115,7 @@ class Server:
         for world in client_reply.worlds:
             world.hostname = self.announce_host
             world.port = self.announce_port
-        client_reply_msg = proto.prepareReply(client_reply)
+        client_reply_msg = LoginProtocol.prepareReply(client_reply)
         # Send the message and close the connection.
         conn.send(client_reply_msg.getEncrypted(xtea_key))
         conn.close()
@@ -148,8 +147,7 @@ class Server:
         data = dest_s.recv(size)
         msg = NetworkMessage(data)
 
-        proto = GameProtocol()
-        proto.parseChallengeMessage(msg)
+        GameProtocol.parseChallengeMessage(msg)
         conn.send(size_raw+checksum+data)
 
         data = conn.recv(2)
@@ -158,7 +156,7 @@ class Server:
 
         # Read the XTEA key from the player, pass on the original packet.
         msg = NetworkMessage(data)
-        firstmsg_contents = proto.parseFirstMessage(msg)
+        firstmsg_contents = GameProtocol.parseFirstMessage(msg)
         xtea_key = firstmsg_contents['xtea_key']
         dest_s.send(data)
 
