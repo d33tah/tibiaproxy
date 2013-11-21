@@ -60,7 +60,7 @@ def parseReply(msg, xtea_key):
     Args:
         msg (NetworkMessage): the network message to be parsed.
 
-    Returns LoginReply or None
+    Returns dict or None
     """
     size = msg.getU16()
 
@@ -110,7 +110,7 @@ def prepareReply(login_reply):
     """Prepare the reply based on a LoginReply instance.
 
     Args:
-        login_reply (LoginReply): the login_reply structure used to build
+        login_reply (dict): the login_reply structure used to build
             the response.
 
     Returns NetworkMessage
