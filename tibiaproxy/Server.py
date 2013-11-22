@@ -135,6 +135,8 @@ class Server:
         Returns None
         """
 
+        # send a bogus challenge = 109, timestamp = 1385139009
+        conn.send('\x0c\x00@\x02!\x07\x06\x00\x1fA\x8b\x8fRm')
         # Connect to the game server.
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         log("Connecting to the hardcoded game server (%s:%s)..." % (
@@ -147,8 +149,7 @@ class Server:
         data = dest_s.recv(size)
         msg = NetworkMessage(data)
 
-        GameProtocol.parseChallengeMessage(msg)
-        conn.send(size_raw+checksum+data)
+        challenge_data = GameProtocol.parseChallengeMessage(msg)
 
         data = conn.recv(2)
         size = struct.unpack("<H", data)[0]
@@ -158,6 +159,8 @@ class Server:
         msg = NetworkMessage(data)
         firstmsg_contents = GameProtocol.parseFirstMessage(msg)
         xtea_key = firstmsg_contents['xtea_key']
+        firstmsg_contents['timestamp'] = challenge_data['timestamp']
+        firstmsg_contents['random_number'] = challenge_data['random_number']
         dest_s.send(GameProtocol.prepareReply(firstmsg_contents))
 
         # You might not know this trick.
