@@ -205,13 +205,17 @@ class Server:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
             if conn in has_data:
-                data = conn.recv(1024)
-                if data == '':
+                data = ''
+                size_raw = conn.recv(2)
+                data += size_raw
+                if size_raw == '':
                     log("The client disconnected")
                     break
+                size = struct.unpack("<H", size_raw)[0]
+                data += conn.recv(size+4)
                 msg = NetworkMessage(data)
                 msg_size = msg.getU16()
-                msg.getU32()
+                msg.getU32()  # skip the checksum validation
                 if msg_size != len(data) - 2:
                     log("Strange packet: %s" % repr(data))
                     continue
