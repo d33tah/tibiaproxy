@@ -2,7 +2,7 @@ tibiaproxy v2.1
 ===============
 
 Tibia proxy is a proof of concept proxy for OpenTibia servers with protocol
-version 10.21. Its goal is to provide you with a server you could run on a
+version 10.22. Its goal is to provide you with a server you could run on a
 trusted host that you could connect to, tunneling your Tibia session.
 
 Currently its login server code is very buggy, but it relays the game server
@@ -53,36 +53,34 @@ login connections. When a Tibia client tries to log in, the proxy attempts to
 decrypt the message using the OpenTibia key, extracts the XTEA keys from it
 and forwards the message to the target server. Then, its reply is being sent
 back to the user, with the server IPs changed so that the next connection will
-also be sent by proxy.
+also be sent by proxy. The original world IPs are saved for the next phase.
 
-Then, when a player requests a game server connection, an enormous kludge
-begins - in the current version, a connection is made to the login server and
-the original packet is simply forwarded (we read the XTEA key, though). The
-proxy modifies the reply from the server so that the world list all points to
-the proxy. Then, all the communication between the player, the proxy and
-the game server is relayed so that the proxy feels invisible - with the
-exception that an attempt to say anything will result in printing the effect
-of evaluating the message as Python code instead of sending it over to the
-server, provided that the message began with ">".
+Then, when a player requests a game server connection, it is greeted with a
+fake crypto challenge to provoke a reply. Tibiaproxy makes a connection to the
+game server assigned to the requested character and sends the player's reply
+with the challenge fixed up. Then, all the communication between the player,
+the proxy and the game server is relayed so that the proxy feels invisible -
+with the exception that an attempt to say anything will result in printing the
+effect of evaluating the message as Python code instead of sending it over to
+the server, provided that the message began with ">".
 
-The current destination game server IP is hardcoded in config.py. The proxy
-listens on two ports - one for the login server, one for game server.
+Currently the proxy listens on two ports - one for the login server, one for
+game server.
 
 Bugs, problems
 ==============
 
 Currently, only a small fraction of the Tibia protocol is implemented and none
-of the features are guaranteed to work. The target hostname is hardcoded and
-the proxy will only let the user connect to the game server specified in the
-configuration file. Also, I received reports about bot lagging under Windows.
+of the features are guaranteed to work. The real_tibia mode doesn't work yet.
+Also, I received reports about bot lagging under Windows.
 
 TO-DO list
 ==========
 
-* clean up the code related to packet building, fix the padding code
-* investigate why sometimes the server message has incorrect length
-* properly read the game server IP based on character name, not config.py
+* clean up the code, add the missing documentation
+* add real Tibia support
 * investigate the Windows lagging problem
+* investigate why sometimes the server message has incorrect length
 
 In the far future, there is a plan to add some record-and-replay/scripting
 capabilities and port the proxy to the latest Tibia protocol.
