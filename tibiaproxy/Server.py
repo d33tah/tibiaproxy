@@ -37,14 +37,11 @@ class Server:
     the server."""
 
     def __init__(self, destination_login_host, destination_login_port,
-                 destination_game_host, destination_game_port,
                  listen_login_host, listen_login_port,
                  listen_game_host, listen_game_port,
                  announce_host, announce_port, real_tibia):
         self.destination_login_host = destination_login_host
         self.destination_login_port = int(destination_login_port)
-        self.destination_game_host = destination_game_host
-        self.destination_game_port = int(destination_game_port)
         self.listen_login_host = listen_login_host
         self.listen_login_port = int(listen_login_port)
         self.listen_game_host = listen_game_host

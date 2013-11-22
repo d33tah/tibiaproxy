@@ -24,8 +24,6 @@ from tibiaproxy.Server import Server
 if __name__ == '__main__':
     s = Server(destination_login_host=config.destination_login_host,
                destination_login_port=config.destination_login_port,
-               destination_game_host=config.destination_game_host,
-               destination_game_port=config.destination_game_port,
                listen_login_host=config.listen_login_host,
                listen_login_port=config.listen_login_port,
                listen_game_host=config.listen_game_host,

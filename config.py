@@ -5,10 +5,6 @@ real_tibia = False
 destination_login_host = '127.0.0.1'
 destination_login_port = '7172'
 
-# The game server address and port number the proxy has to connect to.
-destination_game_host = '127.0.0.1'
-destination_game_port = '7173'
-
 # The server address and port number the
 # login part of the proxy will listen on.
 listen_login_host = '127.0.0.1'
