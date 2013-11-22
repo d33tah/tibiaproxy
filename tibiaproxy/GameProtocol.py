@@ -98,5 +98,5 @@ def prepareReply(handshake_reply):
     to_encrypt = to_encrypt_msg.getRaw()
     first16_wo_headers = handshake_reply['first_16'][6:]
     rest = first16_wo_headers + RSA.RSA_encrypt(to_encrypt, n=RSA.otserv_n)
-    checksum = struct.pack("<I", adlerChecksum(str(rest)))
+    checksum = struct.pack("<I", adlerChecksum(rest))
     return (handshake_reply['first_16'][:2] + checksum + rest)

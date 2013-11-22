@@ -29,7 +29,8 @@ def adlerChecksum(buf):
     """Calculates the Adler checksum for the given buffer.
 
     Args:
-        buf (str): the buffer that will have its Adler checksum calculated
+        buf (bytearray): the buffer that will have its Adler checksum
+                         calculated
 
     Returns int
     """
@@ -42,7 +43,7 @@ def adlerChecksum(buf):
         tmp = 5552 if length > 5552 else length
         length -= tmp
         for i in reversed(range(tmp)):
-            a += ord(buf[pos])
+            a += buf[pos]
             b += a
             pos += 1
         a %= adler

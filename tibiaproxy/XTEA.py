@@ -66,7 +66,7 @@ def XTEA_encrypt(buf, k):
         buf (str): the data to be encrypted
         k (list): XTEA key - a list of four OpenTibia U32 integers
 
-    Returns NetworkMessage
+    Returns bytearray
     """
     ret = ""
     for offset in range(len(buf)/8):
@@ -83,7 +83,7 @@ def XTEA_encrypt(buf, k):
                   (sum + U32(k[sum >> U32(11) & U32(3)]))
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
-    return ret
+    return bytearray(ret)
 
 
 def XTEA_decrypt(buf, k):
@@ -93,7 +93,7 @@ def XTEA_decrypt(buf, k):
         buf (str): the data to be decrypted
         k (list): XTEA key - a list of four OpenTibia U32 integers
 
-    Returns NetworkMessage
+    Returns bytearray
     """
     ret = ""
     for offset in range(len(buf)/8):
@@ -110,4 +110,4 @@ def XTEA_decrypt(buf, k):
                   (sum + U32(k[sum & U32(3)]))
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
-    return ret
+    return bytearray(ret)

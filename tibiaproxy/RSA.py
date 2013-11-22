@@ -105,10 +105,10 @@ def RSA_decrypt(c_bin):
     Args:
         c_bin (bytearray): the message to be decrypted
 
-    Returns str
+    Returns bytearray
     """
     # return z = c^d % n. pow(c,d,n) is way faster than z = c**d % n.
-    return int_to_buf(pow(buf_to_int(c_bin), d, otserv_n))
+    return bytearray(int_to_buf(pow(buf_to_int(c_bin), d, otserv_n)))
 
 
 def RSA_encrypt(m_bin, n=tibia_n):
@@ -119,7 +119,7 @@ def RSA_encrypt(m_bin, n=tibia_n):
         m_bin (bytearray): the message to be encrypted
         n (int): the public key used for encryption (default to real Tibia key)
 
-    Return str
+    Return bytearray
     """
     # return c = m^e mod n, where e = 65537
-    return int_to_buf(pow(buf_to_int(m_bin), 65537, n))
+    return bytearray(int_to_buf(pow(buf_to_int(m_bin), 65537, n)))
