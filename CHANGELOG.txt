@@ -1,5 +1,16 @@
 The following is a log of changes for the tibiaproxy project.
 
+3.0 [22 Nov 2013]
+\
+* Debug mode, which doesn't use any threading.
+* New plugin system, along with old "eval" plugin and "hello" example.
+* Removed destination_game_host/port.
+* Don't crash completely on runtime errors.
+* Early (not working yet) code for real Tibia support.
+* Allow any number of characters and worlds.
+* If the login server reply does not seem to contain character list, just
+  forward it.
+
 2.1 [04 Nov 2013]
 * Fixed the bug which led to a crash when user tried to log in twice.
 
