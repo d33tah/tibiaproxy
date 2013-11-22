@@ -48,9 +48,10 @@ class Connection:
         sendmsg.addU16(pos[0])
         sendmsg.addU16(pos[1])
         sendmsg.addByte(pos[2])
-        sendmsg.writable = True  #FIXME
+        sendmsg.writable = True  # FIXME
         sendmsg.addString(msg)
         self.conn.send(sendmsg.getEncrypted(self.xtea_key))
+
 
 class Server:
     """Runs the proxy, coordinating the data flow between the user, proxy and
@@ -179,7 +180,6 @@ class Server:
 
         challenge_data = GameProtocol.parseChallengeMessage(msg)
 
-
         xtea_key = firstmsg_contents['xtea_key']
         firstmsg_contents['timestamp'] = challenge_data['timestamp']
         firstmsg_contents['random_number'] = challenge_data['random_number']
@@ -297,7 +297,6 @@ class Server:
             while True:
                 accept_game_conn()
 
-
     def run(self):
         """Run serveLogin and serveGame threads and sleep forever.
 
@@ -326,7 +325,6 @@ class Server:
         else:
             self.serveLogin(True)
             self.serveGame(True)
-
 
         if not self.debug:
             # http://stackoverflow.com/q/3788208/1091116
