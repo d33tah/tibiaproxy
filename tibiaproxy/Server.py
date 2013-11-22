@@ -63,6 +63,7 @@ class Server:
         self.g_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.g_s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.g_s.bind((self.listen_game_host, self.listen_game_port))
+        self.characters = {}
 
     def handleLogin(self, conn, msg):
         """Handles the login communication, passing it to the destination host,
@@ -106,12 +107,15 @@ class Server:
             conn.close()
             return
 
+        for character in reply['characters']:
+            self.characters[character['name']] = character
+
         # Replace the IP and port with the address to the proxy.
         # FIXME: the prepareReply is bugged, builds broken login server
         # packets.
         # TODO: save the original IP addresses in a dictionary so that game
         # server IPs different than the login server IP.
-        client_reply = copy.copy(reply)
+        client_reply = copy.deepcopy(reply)
         for world in client_reply['worlds']:
             world['hostname'] = self.announce_host
             world['port'] = self.announce_port
@@ -138,11 +142,20 @@ class Server:
         # send a bogus challenge = 109, timestamp = 1385139009
         conn.send('\x0c\x00@\x02!\x07\x06\x00\x1fA\x8b\x8fRm')
         # Connect to the game server.
+
+        data = conn.recv(2)
+        size = struct.unpack("<H", data)[0]
+        data += conn.recv(size)
+        # Read the XTEA key from the player, pass on the original packet.
+        msg = NetworkMessage(data)
+        firstmsg_contents = GameProtocol.parseFirstMessage(msg)
+
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        log("Connecting to the hardcoded game server (%s:%s)..." % (
-            self.destination_game_host, self.destination_game_port))
-        dest_s.connect((self.destination_game_host,
-                        self.destination_game_port))
+        character = self.characters[firstmsg_contents['character_name']]
+        game_host = character['world']['hostname']
+        game_port = character['world']['port']
+        log("Connecting to the game server (%s:%s)." % (game_host, game_port))
+        dest_s.connect((game_host, game_port))
         size_raw = dest_s.recv(2)
         size = struct.unpack("<H", size_raw)[0]
         checksum = dest_s.recv(4)
@@ -151,13 +164,7 @@ class Server:
 
         challenge_data = GameProtocol.parseChallengeMessage(msg)
 
-        data = conn.recv(2)
-        size = struct.unpack("<H", data)[0]
-        data += conn.recv(size)
 
-        # Read the XTEA key from the player, pass on the original packet.
-        msg = NetworkMessage(data)
-        firstmsg_contents = GameProtocol.parseFirstMessage(msg)
         xtea_key = firstmsg_contents['xtea_key']
         firstmsg_contents['timestamp'] = challenge_data['timestamp']
         firstmsg_contents['random_number'] = challenge_data['random_number']
