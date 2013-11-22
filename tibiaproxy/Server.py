@@ -32,6 +32,26 @@ import sys
 import struct
 
 
+class COnnection:
+    def __init__(self, conn, xtea_key):
+        self.conn = conn
+        self.xtea_key = xtea_key
+
+    def client_send_said(self, player, pos, msg):
+        sendmsg = NetworkMessage()
+        sendmsg.addByte(0xAA)
+        sendmsg.addU32(3)  # statement ID
+        sendmsg.addString("1")
+        sendmsg.addU16(1)  # level
+        sendmsg.addByte(1)  # type: SPEAK_SAY
+        assert(len(pos) == 3)
+        sendmsg.addU16(pos[0])
+        sendmsg.addU16(pos[1])
+        sendmsg.addByte(pos[2])
+        sendmsg.writable = True  #FIXME
+        sendmsg.addString(msg)
+        self.conn.send(sendmsg.getEncrypted(self.xtea_key))
+
 class Server:
     """Runs the proxy, coordinating the data flow between the user, proxy and
     the server."""
@@ -39,7 +59,7 @@ class Server:
     def __init__(self, destination_login_host, destination_login_port,
                  listen_login_host, listen_login_port,
                  listen_game_host, listen_game_port,
-                 announce_host, announce_port, real_tibia, debug):
+                 announce_host, announce_port, real_tibia, debug, plugins):
         self.destination_login_host = destination_login_host
         self.destination_login_port = int(destination_login_port)
         self.listen_login_host = listen_login_host
@@ -50,6 +70,7 @@ class Server:
         self.announce_port = int(announce_port)
         self.real_tibia = real_tibia
         self.debug = debug
+        self.plugins = plugins
 
         # Try to request the TCP port from the operating system. Tell it that
         # it is going to be a reusable port, so that a sudden crash of the
@@ -183,6 +204,7 @@ class Server:
         # and if there's less than n bytes in the buffer, we'll read them all.
         dest_s.setblocking(0)
         conn.setblocking(0)
+        conn_obj = COnnection(conn, xtea_key)
         while True:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
@@ -202,6 +224,7 @@ class Server:
                 msg.getU16()
                 packet_type = msg.getByte()
                 player_said = ""
+                should_forward = True
                 if packet_type == 150:
                     # We got a player "say" request. Read what the player
                     # wanted to say, treat it like a Python expression and send
@@ -209,24 +232,11 @@ class Server:
                     msg.skipBytes(1)
                     player_said = msg.getString()
                     print("Player said %s!" % player_said)
-                if player_said.startswith(">"):
-                    try:
-                        to_send = str(eval(player_said[1:].lstrip()))
-                    except Exception, e:
-                        to_send = str(e)
-                    sendmsg = NetworkMessage()
-                    sendmsg.addByte(0xAA)
-                    sendmsg.addU32(3)  # statement ID
-                    sendmsg.addString("1")
-                    sendmsg.addU16(1)  # level
-                    sendmsg.addByte(1)  # type: SPEAK_SAY
-                    sendmsg.addU16(96)  # pos
-                    sendmsg.addU16(123)
-                    sendmsg.addByte(7)
-                    sendmsg.writable = True
-                    sendmsg.addString(to_send)
-                    conn.send(sendmsg.getEncrypted(xtea_key))
-                else:
+                    for plugin in self.plugins:
+                        if 'on_client_say' in dir(plugin):
+                            plugin_returned = plugin.on_client_say(conn_obj,
+                                                                   player_said)
+                if should_forward:
                     # Otherwise, just pass the packet to the server.
                     dest_s.send(data)
             if dest_s in has_data:

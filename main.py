@@ -20,8 +20,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 import config
 from tibiaproxy.Server import Server
+import importlib
+import os
+from tibiaproxy.util import log
 
 if __name__ == '__main__':
+
+    plugins = []
+    for filename in os.listdir('plugins'):
+        if filename == "__init__.py" or filename[-3:] != ".py":
+            continue
+        plugin_name = filename[:-3]
+        plugins += [importlib.import_module('plugins.' + plugin_name)]
+        log("Loaded plugin %s." % plugin_name)
+
     s = Server(destination_login_host=config.destination_login_host,
                destination_login_port=config.destination_login_port,
                listen_login_host=config.listen_login_host,
@@ -31,5 +43,6 @@ if __name__ == '__main__':
                announce_host=config.announce_host,
                announce_port=config.announce_port,
                real_tibia=config.real_tibia,
-               debug=config.debug)
+               debug=config.debug,
+               plugins=plugins)
     s.run()
