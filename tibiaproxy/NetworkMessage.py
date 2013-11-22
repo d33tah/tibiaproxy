@@ -242,6 +242,7 @@ class NetworkMessage:
         Returns None
         """
         self.buf[self.pos:self.pos+4] = struct.pack("<I", u32)
+        self.pos += 4
 
     def replaceByte(self, byte):
         """Replaces the U32 at the current position with a given U32.
@@ -252,3 +253,4 @@ class NetworkMessage:
         Returns None
         """
         self.buf[self.pos] = byte
+        self.pos += 1

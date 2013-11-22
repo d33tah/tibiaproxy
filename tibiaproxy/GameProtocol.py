@@ -20,8 +20,9 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
-from NetworkMessage import NetworkMessage
+from NetworkMessage import NetworkMessage, adlerChecksum
 import RSA
+import struct
 
 
 def create_handshake_challenge(timestamp, random_number):
@@ -89,5 +90,13 @@ def parseFirstMessage(orig_msg):
 
 
 def prepareReply(handshake_reply):
-    return (handshake_reply['first_16'] +
-            RSA.RSA_encrypt(handshake_reply['decrypted_raw'], n=RSA.otserv_n))
+    to_encrypt_raw = handshake_reply['decrypted_raw']
+    to_encrypt_msg = NetworkMessage(to_encrypt_raw)
+    to_encrypt_msg.skipBytes(handshake_reply['challenge_pos'])
+    to_encrypt_msg.replaceU32(handshake_reply['timestamp'])
+    to_encrypt_msg.replaceByte(handshake_reply['random_number'])
+    to_encrypt = to_encrypt_msg.getRaw()
+    first16_wo_headers = handshake_reply['first_16'][6:]
+    rest = first16_wo_headers + RSA.RSA_encrypt(to_encrypt, n=RSA.otserv_n)
+    checksum = struct.pack("<I", adlerChecksum(str(rest)))
+    return (handshake_reply['first_16'][:2] + checksum + rest)
