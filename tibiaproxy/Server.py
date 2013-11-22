@@ -39,7 +39,7 @@ class Server:
     def __init__(self, destination_login_host, destination_login_port,
                  listen_login_host, listen_login_port,
                  listen_game_host, listen_game_port,
-                 announce_host, announce_port, real_tibia):
+                 announce_host, announce_port, real_tibia, debug):
         self.destination_login_host = destination_login_host
         self.destination_login_port = int(destination_login_port)
         self.listen_login_host = listen_login_host
@@ -49,6 +49,7 @@ class Server:
         self.announce_host = announce_host
         self.announce_port = int(announce_port)
         self.real_tibia = real_tibia
+        self.debug = debug
 
         # Try to request the TCP port from the operating system. Tell it that
         # it is going to be a reusable port, so that a sudden crash of the
@@ -238,29 +239,54 @@ class Server:
                     break
                 conn.send(data)
 
-    def serveLogin(self):
+    def serveLogin(self, one_shot=False):
         """Listen for login server connections and handle them.
+
+        Args:
+            one_shot (bool): True if we want to handle a single connection, in
+                             the main thread.
 
         Returns None
         """
-        while True:
+        def accept_login_conn():
             conn, addr = self.l_s.accept()
             log("Received a login connection from %s:%s" % addr)
             data = conn.recv(1024)
             msg = NetworkMessage(data)
-            t = threading.Thread(target=self.handleLogin, args=[conn, msg])
-            t.start()
+            if not self.debug:
+                t = threading.Thread(target=self.handleLogin, args=[conn, msg])
+                t.start()
+            else:
+                self.handleLogin(conn, msg)
 
-    def serveGame(self):
+        if one_shot:
+            accept_login_conn()
+            return
+        else:
+            while True:
+                accept_login_conn()
+
+    def serveGame(self, one_shot=False):
         """Listen for game server connections and handle them.
 
         Returns None
         """
-        while True:
+        def accept_game_conn():
             conn, addr = self.g_s.accept()
             log("Received a game server connection from %s:%s" % addr)
-            t = threading.Thread(target=self.handleGame, args=[conn])
-            t.start()
+            if not self.debug:
+                t = threading.Thread(target=self.handleGame, args=[conn])
+                t.start()
+            else:
+                self.handleGame(conn)
+
+        if one_shot:
+            accept_game_conn()
+            return
+        else:
+            while True:
+                accept_game_conn()
+
 
     def run(self):
         """Run serveLogin and serveGame threads and sleep forever.
@@ -278,18 +304,24 @@ class Server:
         self.l_s.listen(1)
         self.g_s.listen(1)
 
-        t_l = threading.Thread(target=self.serveLogin)
-        g_l = threading.Thread(target=self.serveGame)
+        if not self.debug:
+            t_l = threading.Thread(target=self.serveLogin)
+            g_l = threading.Thread(target=self.serveGame)
 
-        t_l.daemon = True
-        g_l.daemon = True
+            t_l.daemon = True
+            g_l.daemon = True
 
-        t_l.start()
-        g_l.start()
+            t_l.start()
+            g_l.start()
+        else:
+            self.serveLogin(True)
+            self.serveGame(True)
 
-        # http://stackoverflow.com/q/3788208/1091116
-        try:
-            while True:
-                time.sleep(100)
-        except (KeyboardInterrupt, SystemExit):
-            sys.exit("Received keyboard interrupt, quitting")
+
+        if not self.debug:
+            # http://stackoverflow.com/q/3788208/1091116
+            try:
+                while True:
+                    time.sleep(100)
+            except (KeyboardInterrupt, SystemExit):
+                sys.exit("Received keyboard interrupt, quitting")

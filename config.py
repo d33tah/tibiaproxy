@@ -20,3 +20,6 @@ listen_game_port = int(listen_login_port) - 1
 # Change it only if you're behind a NAT. Defaults to the listen address.
 announce_host = listen_login_host
 announce_port = listen_game_port
+
+# Whether we're in the debug mode or not.
+debug = False
