@@ -32,7 +32,7 @@ import sys
 import struct
 
 
-class COnnection:
+class Connection:
     def __init__(self, conn, xtea_key):
         self.conn = conn
         self.xtea_key = xtea_key
@@ -200,7 +200,7 @@ class Server:
         # and if there's less than n bytes in the buffer, we'll read them all.
         dest_s.setblocking(0)
         conn.setblocking(0)
-        conn_obj = COnnection(conn, xtea_key)
+        conn_obj = Connection(conn, xtea_key)
         while True:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
