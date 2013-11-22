@@ -183,7 +183,8 @@ class Server:
         xtea_key = firstmsg_contents['xtea_key']
         firstmsg_contents['timestamp'] = challenge_data['timestamp']
         firstmsg_contents['random_number'] = challenge_data['random_number']
-        dest_s.send(GameProtocol.prepareReply(firstmsg_contents))
+        dest_s.send(GameProtocol.prepareReply(firstmsg_contents,
+                                              self.real_tibia))
 
         # You might not know this trick.
         #
@@ -236,6 +237,10 @@ class Server:
                         if 'on_client_say' in dir(plugin):
                             plugin_returned = plugin.on_client_say(conn_obj,
                                                                    player_said)
+
+                            if plugin_returned:
+                                should_forward = False
+
                 if should_forward:
                     # Otherwise, just pass the packet to the server.
                     dest_s.send(data)

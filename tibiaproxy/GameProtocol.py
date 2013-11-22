@@ -89,7 +89,7 @@ def parseFirstMessage(orig_msg):
                                   decrypted_raw=bytearray(msg_buf))
 
 
-def prepareReply(handshake_reply):
+def prepareReply(handshake_reply, real_tibia):
     to_encrypt_raw = handshake_reply['decrypted_raw']
     to_encrypt_msg = NetworkMessage(to_encrypt_raw)
     to_encrypt_msg.skipBytes(handshake_reply['challenge_pos'])
@@ -97,6 +97,10 @@ def prepareReply(handshake_reply):
     to_encrypt_msg.replaceByte(handshake_reply['random_number'])
     to_encrypt = to_encrypt_msg.getRaw()
     first16_wo_headers = handshake_reply['first_16'][6:]
-    rest = first16_wo_headers + RSA.RSA_encrypt(to_encrypt, n=RSA.otserv_n)
+    if real_tibia:
+        encrypted = RSA.RSA_encrypt(to_encrypt)
+    else:
+        encrypted = RSA.RSA_encrypt(to_encrypt, n=RSA.otserv_n)
+    rest = first16_wo_headers + encrypted
     checksum = struct.pack("<I", adlerChecksum(rest))
     return (handshake_reply['first_16'][:2] + checksum + rest)
