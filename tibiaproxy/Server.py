@@ -212,9 +212,10 @@ class Server:
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
                 packet_type = msg.getByte()
-                if packet_type in GameProtocol.packet_types:
+                if packet_type in GameProtocol.client_packet_types:
                     if self.debug:
-                        log("K %s" % GameProtocol.packet_types[packet_type])
+                        log("K %s" %
+                            GameProtocol.client_packet_types[packet_type])
                 else:
                     log("Got a packet of type %s from client" % packet_type)
                 should_forward = True
@@ -258,9 +259,10 @@ class Server:
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
                 packet_type = msg.getByte()
-                if packet_type in GameProtocol.packet_types:
+                if packet_type in GameProtocol.server_packet_types:
                     if self.debug:
-                        log("S %s" % GameProtocol.packet_types[packet_type])
+                        log("S %s" %
+                            GameProtocol.server_packet_types[packet_type])
                 else:
                     log("Got a packet of type %s from server" % packet_type)
 
