@@ -107,10 +107,11 @@ class Server:
             dest_s.send(msg.getRaw())
         else:
             reencrypted = RSA.RSA_encrypt(RSA.RSA_decrypt(msg.getRaw()[28:]))
+            unencrypted = msg.getRaw()[6:28]
             new_buf = ""
             new_buf += msg.getRaw()[:2]
-            new_buf += struct.pack("<I", adlerChecksum(reencrypted))
-            new_buf += msg.getRaw()[6:28]
+            new_buf += struct.pack("<I", adlerChecksum(unencrypted+reencrypted))
+            new_buf += unencrypted
             new_buf += reencrypted
             dest_s.send(new_buf)
         data = dest_s.recv(1024)
