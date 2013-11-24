@@ -71,14 +71,13 @@ Bugs, problems
 ==============
 
 Currently, only a small fraction of the Tibia protocol is implemented and none
-of the features are guaranteed to work. The real_tibia mode doesn't work yet.
-Also, I received reports about bot lagging under Windows.
+of the features are guaranteed to work. Also, I received reports about bot
+lagging under Windows.
 
 TO-DO list
 ==========
 
 * clean up the code, add the missing documentation
-* add real Tibia support
 * investigate the Windows lagging problem
 * investigate why sometimes the server message has incorrect length
 
