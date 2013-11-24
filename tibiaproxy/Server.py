@@ -187,21 +187,6 @@ class Server:
         dest_s.send(GameProtocol.prepareReply(firstmsg_contents,
                                               self.real_tibia))
 
-        # You might not know this trick.
-        #
-        # By default, the read(n) operation on a socket causes a so-called
-        # blocking read. This means that the operating system will block the
-        # program flow until it reads all the n requested bytes. This means
-        # that we will keep waiting for the socket data if it's not there and
-        # for example, while we're waiting for the player data, a game server
-        # could send something interesting. It could even take seconds. This
-        # is not acceptable.
-        #
-        # This is why we're switching the sockets to the non-blocking mode.
-        # In this mode, recv(n) will return immediately with *at most* n bytes,
-        # and if there's less than n bytes in the buffer, we'll read them all.
-        dest_s.setblocking(0)
-        conn.setblocking(0)
         conn_obj = Connection(conn, xtea_key)
         while True:
             # Wait until either the player or the server sent some data.
