@@ -97,7 +97,7 @@ def int_to_buf(num):
     return num_bin
 
 
-def RSA_decrypt(c_bin):
+def RSA_decrypt(c_bin, n=otserv_n):
     """Decrypts an RSA-encrypted message with an OpenTibia key.
 
     Args:
@@ -109,7 +109,7 @@ def RSA_decrypt(c_bin):
     return bytearray(int_to_buf(pow(buf_to_int(c_bin), d, otserv_n)))
 
 
-def RSA_encrypt(m_bin, n=tibia_n):
+def RSA_encrypt(m_bin, n=tibia_n, e=65537):
     """Encrypts a message using RSA algorithm with a key from the second
     argument (defaults to real Tibia key version 8.61+).
 
