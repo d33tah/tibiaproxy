@@ -116,7 +116,7 @@ class Server:
             dest_s.send(new_buf)
         data = dest_s.recv(1024)
         if data == '':
-            print("Server disconnected.")
+            log("Server disconnected.")
             conn.close()
             return
         msg = NetworkMessage(data)
