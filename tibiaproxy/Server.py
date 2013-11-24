@@ -274,7 +274,8 @@ class Server:
                 msg.getU16()
                 packet_type = msg.getByte()
                 if packet_type in GameProtocol.packet_types:
-                    log("S %s" % GameProtocol.packet_types[packet_type])
+                    if self.debug:
+                        log("S %s" % GameProtocol.packet_types[packet_type])
                 else:
                     log("Got a packet of type %s from server" % packet_type)
 
