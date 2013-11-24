@@ -227,6 +227,11 @@ class Server:
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
                 packet_type = msg.getByte()
+                if packet_type in GameProtocol.packet_types:
+                    if self.debug:
+                        log("K %s" % GameProtocol.packet_types[packet_type])
+                else:
+                    log("Got a packet of type %s from client" % packet_type)
                 should_forward = True
                 if packet_type == 150:
                     # We got a player "say" request. Read what the player
