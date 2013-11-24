@@ -251,13 +251,33 @@ class Server:
                     # Otherwise, just pass the packet to the server.
                     dest_s.send(data)
             if dest_s in has_data:
-                # Server sent us some data. Currently, no parsing is done -
-                # just pass it to the player.
-                data = dest_s.recv(1024)
+                # Server sent us some data.
+                data = ''
+                size_raw = dest_s.recv(2)
+                data += size_raw
                 if data == '':
                     conn.close()
                     log("The server disconnected")
                     break
+                size = struct.unpack("<H", size_raw)[0]
+                data += dest_s.recv(size+4)
+                msg = NetworkMessage(data)
+                msg_size = msg.getU16()
+                msg.getU32()  # skip the checksum validation
+                if msg_size != len(data) - 2:
+                    log("Strange packet from server: %s" % repr(data))
+                    log("len(data)=%s, msg_size=%s" % (len(data), msg_size))
+                    conn.send(data)
+                    continue
+                msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
+                msg = NetworkMessage(msg_buf)
+                msg.getU16()
+                packet_type = msg.getByte()
+                if packet_type in GameProtocol.packet_types:
+                    log("S %s" % GameProtocol.packet_types[packet_type])
+                else:
+                    log("Got a packet of type %s from server" % packet_type)
+
                 conn.send(data)
 
     def serveLogin(self, one_shot=False):
