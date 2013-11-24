@@ -219,7 +219,9 @@ class Server:
                 msg_size = msg.getU16()
                 msg.getU32()  # skip the checksum validation
                 if msg_size != len(data) - 2:
-                    log("Strange packet: %s" % repr(data))
+                    log("Strange packet from client: %s" % repr(data))
+                    log("len(data)=%s, msg_size=%s" % (len(data), msg_size))
+                    dest_s.send(data)
                     continue
                 msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
                 msg = NetworkMessage(msg_buf)
