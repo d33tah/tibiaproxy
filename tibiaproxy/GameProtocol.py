@@ -107,8 +107,9 @@ def prepareReply(handshake_reply, real_tibia):
 
 # Generated based on Edubart's OpenTibiaClient code:
 #
-# egrep '(Game|Client).*= ([0-9]){1,3},' ./src/client/protocolcodes.h | \
-#     sed -e 's/GameServer//g' -e 's/Client//g'  | \
+# TYPE="GameServer"
+# egrep $TYPE'.*= ([0-9]){1,3},' ./src/client/protocolcodes.h | \
+#     sed -e "s/$TYPE//g"   | \
 #     python -c 'while True:
 #         print(
 #             "%s: \"%s\"," % tuple(
@@ -116,7 +117,7 @@ def prepareReply(handshake_reply, real_tibia):
 #                     raw_input().split(",")[0].replace(" ","").split("=")
 #                 )
 #             )
-#         )' | sort -n | uniq | grep -v '50:'
+#         )' | sort -n | uniq | grep -v '^50:'
 client_packet_types = {
     1: "EnterAccount",
     10: "PendingGame",
