@@ -1,5 +1,8 @@
 The following is a log of changes for the tibiaproxy project.
 
+3.2 [22 Nov 2013]
+* Fixed real Tibia support.
+
 3.1 [22 Nov 2013]
 * If plugin returned True, don't forward the packet.
 
