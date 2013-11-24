@@ -225,7 +225,6 @@ class Server:
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
                 packet_type = msg.getByte()
-                player_said = ""
                 should_forward = True
                 if packet_type == 150:
                     # We got a player "say" request. Read what the player
@@ -233,7 +232,6 @@ class Server:
                     # the result back to the user.
                     msg.skipBytes(1)
                     player_said = msg.getString()
-                    print("Player said %s!" % player_said)
                     for plugin in self.plugins:
                         if 'on_client_say' in dir(plugin):
                             plugin_returned = plugin.on_client_say(conn_obj,
