@@ -105,8 +105,10 @@ def RSA_decrypt(c_bin, n=otserv_n):
 
     Returns bytearray
     """
-    # return z = c^d % n. pow(c,d,n) is way faster than z = c**d % n.
-    return bytearray(int_to_buf(pow(buf_to_int(c_bin), d, otserv_n)))
+    c = buf_to_int(c_bin)
+    # z = c^d % n. pow(c,d,n) is way faster than z = c**d % n.
+    z = pow(c, d, n)
+    return bytearray(int_to_buf(z))
 
 
 def RSA_encrypt(m_bin, n=tibia_n, e=65537):
@@ -119,5 +121,7 @@ def RSA_encrypt(m_bin, n=tibia_n, e=65537):
 
     Return bytearray
     """
-    # return c = m^e mod n, where e = 65537
-    return bytearray(int_to_buf(pow(buf_to_int(m_bin), 65537, n)))
+    # return c = m^e mod n
+    m = buf_to_int(m_bin)
+    c = pow(m, e, n)
+    return bytearray(int_to_buf(c))
