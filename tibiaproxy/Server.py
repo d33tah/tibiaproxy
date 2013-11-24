@@ -110,7 +110,8 @@ class Server:
             unencrypted = msg.getRaw()[6:28]
             new_buf = ""
             new_buf += msg.getRaw()[:2]
-            new_buf += struct.pack("<I", adlerChecksum(unencrypted+reencrypted))
+            new_buf += struct.pack("<I",
+                                   adlerChecksum(unencrypted+reencrypted))
             new_buf += unencrypted
             new_buf += reencrypted
             dest_s.send(new_buf)
