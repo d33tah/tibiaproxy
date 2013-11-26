@@ -2,23 +2,21 @@
 GameProtocol.py - contains code needed to handle the game protocol.
 """
 
-"""
-This file is part of tibiaproxy.
-
-tibiaproxy is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-Joggertester is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-"""
+# This file is part of tibiaproxy.
+#
+# tibiaproxy is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Joggertester is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 from NetworkMessage import NetworkMessage, adlerChecksum
 import RSA
@@ -26,12 +24,36 @@ import struct
 
 
 def create_handshake_challenge(timestamp, random_number):
+    """Create a handshake challenge dictionary based on the given parameters.
+
+    Args:
+        timestamp (int): the challenge's timestamp
+        random_number (int): the challenge random number
+    Returns dict
+    """
     return {'timestamp': timestamp, 'random_number': random_number}
 
 
 def create_handshake_reply(xtea_key, account_number, password, character_name,
                            timestamp, random_number, challenge_pos, first_16,
                            decrypted_raw):
+    """Create a handshake reply dictionary. This is the first packet the client
+    sends to the game server.
+
+    Args:
+        xtea_key (int): the XTEA key used in further communication
+        account_number (string): the account ID
+        password (string): the account password
+        character_name (string): the character to be logged in
+        timestamp (int) the challenge's timestamp response
+        random_number (int): the challenge's random number response
+        challenge_pos (int): the offset at which the challenge can be found
+        first_16 (int): the first 16 bytes of the original message
+        decrypted_raw (bytearray): the unencrypted original message
+
+    Returns dict
+    """
+    # FIXME: decrypted_raw feels odd. There should be a better way.
     return {'xtea_key': xtea_key,
             'account_number': account_number,
             'password': password,
@@ -70,7 +92,7 @@ def parseFirstMessage(orig_msg):
     msg_buf = RSA.RSA_decrypt(orig_msg.getRest()[:128])
     msg = NetworkMessage(msg_buf)
     # Extract the XTEA keys from the RSA-decrypted message.
-    xtea_key = [msg.getU32() for i in range(4)]
+    xtea_key = [msg.getU32() for _ in range(4)]
     assert(msg.getByte() == 0)        # gamemaster flag
     account_number = msg.getString()  # account
     character_name = msg.getString()  # character name
@@ -90,6 +112,15 @@ def parseFirstMessage(orig_msg):
 
 
 def prepareReply(handshake_reply, real_tibia):
+    """Create a handshake reply based on the dictionary from the argument that
+    has a modified challenge response.
+
+    handshake_reply (dict): the origina handshake reply dictionary
+    real_tibia (bool): whether to reencrypt the message for real Tibia
+
+    Returns bytearray
+    """
+
     to_encrypt_raw = handshake_reply['decrypted_raw']
     to_encrypt_msg = NetworkMessage(to_encrypt_raw)
     to_encrypt_msg.skipBytes(handshake_reply['challenge_pos'])

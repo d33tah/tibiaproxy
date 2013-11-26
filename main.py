@@ -24,8 +24,8 @@ import importlib
 import os
 from tibiaproxy.util import log
 
-if __name__ == '__main__':
-
+def main():
+    """tibiaproxy's entry point."""
     plugins = []
     for filename in os.listdir('plugins'):
         if filename == "__init__.py" or filename[-3:] != ".py":
@@ -34,7 +34,7 @@ if __name__ == '__main__':
         plugins += [importlib.import_module('plugins.' + plugin_name)]
         log("Loaded plugin %s." % plugin_name)
 
-    s = Server(destination_login_host=config.destination_login_host,
+    server = Server(destination_login_host=config.destination_login_host,
                destination_login_port=config.destination_login_port,
                listen_login_host=config.listen_login_host,
                listen_login_port=config.listen_login_port,
@@ -45,4 +45,7 @@ if __name__ == '__main__':
                real_tibia=config.real_tibia,
                debug=config.debug,
                plugins=plugins)
-    s.run()
+    server.run()
+
+if __name__ == '__main__':
+    main()

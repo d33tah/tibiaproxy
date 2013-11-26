@@ -1,25 +1,22 @@
-"""
-A utility class used to extract structures out of network messages and build
+"""A utility class used to extract structures out of network messages and build
 custom ones.
 """
 
-"""
-This file is part of tibiaproxy.
-
-tibiaproxy is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-Joggertester is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-"""
+#This file is part of tibiaproxy.
+#
+#tibiaproxy is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation; either version 2 of the License, or
+#(at your option) any later version.
+#
+#Joggertester is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with Foobar; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 import struct
 import XTEA
@@ -42,7 +39,7 @@ def adlerChecksum(buf):
     while length > 0:
         tmp = 5552 if length > 5552 else length
         length -= tmp
-        for i in reversed(range(tmp)):
+        for _ in reversed(range(tmp)):
             a += buf[pos]
             b += a
             pos += 1
@@ -112,7 +109,6 @@ class NetworkMessage:
 
         Returns None
         """
-        ret = self.buf[self.pos:self.pos+_bytes]
         self.pos += _bytes
 
     def getRest(self):
@@ -131,7 +127,7 @@ class NetworkMessage:
         ret = self.buf
         # Add the padding
         size = len(ret)
-        for i in range(8 - (size) % 8):
+        for _ in range(8 - (size) % 8):
             ret += "%c" % 0x33
 
         ret_with_size = struct.pack("<H", size) + ret

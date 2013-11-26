@@ -1,3 +1,6 @@
+"""This is tibiaproxy configuration file. Edit the lines below to configure
+tibiaproxy."""
+
 # Whether to use real Tibia (True) encryption or OpenTibia encryption (False).
 real_tibia = False
 

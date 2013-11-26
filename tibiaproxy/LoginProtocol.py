@@ -2,23 +2,21 @@
 LoginProtocol.py - contains code needed to handle the login protocol.
 """
 
-"""
-This file is part of tibiaproxy.
-
-tibiaproxy is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-Joggertester is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Foobar; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-"""
+#This file is part of tibiaproxy.
+#
+#tibiaproxy is free software; you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation; either version 2 of the License, or
+#(at your option) any later version.
+#
+#Joggertester is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#GNU General Public License for more details.
+#
+#You should have received a copy of the GNU General Public License
+#along with Foobar; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 from NetworkMessage import NetworkMessage
 import RSA
@@ -51,7 +49,7 @@ def parseFirstMessage(msg):
     msg_buf = RSA.RSA_decrypt(msg.getRest()[:128])
     msg = NetworkMessage(msg_buf)
     # Extract the XTEA keys from the RSA-decrypted message.
-    return [msg.getU32() for i in range(4)]
+    return [msg.getU32() for _ in range(4)]
 
 
 def parseReply(msg, xtea_key):
@@ -83,7 +81,7 @@ def parseReply(msg, xtea_key):
 
     num_worlds = msg.getByte()
     worlds = []
-    for i in range(num_worlds):
+    for _ in range(num_worlds):
         world_id = msg.getByte()
         world_name = msg.getString()
         world_hostname = msg.getString()
@@ -96,7 +94,7 @@ def parseReply(msg, xtea_key):
 
     num_chars = msg.getByte()
     characters = []
-    for i in range(num_chars):
+    for _ in range(num_chars):
         world_num = msg.getByte()
         char_world = worlds[world_num]
         char_name = msg.getString()
