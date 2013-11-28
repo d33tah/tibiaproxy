@@ -160,7 +160,6 @@ class Server:
 
         # send a bogus challenge = 109, timestamp = 1385139009
         conn.send('\x0c\x00@\x02!\x07\x06\x00\x1fA\x8b\x8fRm')
-        # Connect to the game server.
 
         data = conn.recv(2)
         size = struct.unpack("<H", data)[0]
@@ -169,6 +168,7 @@ class Server:
         msg = NetworkMessage(data)
         firstmsg_contents = GameProtocol.parseFirstMessage(msg)
 
+        # Connect to the game server.
         dest_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         character = self.characters[firstmsg_contents['character_name']]
         game_host = character['world']['hostname']
