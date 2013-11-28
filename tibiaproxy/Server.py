@@ -216,8 +216,8 @@ class Server:
                 packet_type = msg.getByte()
                 if packet_type in GameProtocol.client_packet_types:
                     if self.debug:
-                        log("C %s" %
-                            GameProtocol.client_packet_types[packet_type])
+                        log("C [%s] %s" % (hex(packet_type),
+                            GameProtocol.client_packet_types[packet_type]))
                 else:
                     log("Got a packet of type %s from client" % packet_type)
                 should_forward = True
@@ -263,8 +263,8 @@ class Server:
                 packet_type = msg.getByte()
                 if packet_type in GameProtocol.server_packet_types:
                     if self.debug:
-                        log("S %s" %
-                            GameProtocol.server_packet_types[packet_type])
+                        log("S [%s] %s" % (hex(packet_type),
+                            GameProtocol.server_packet_types[packet_type]))
                 else:
                     log("Got a packet of type %s from server" % packet_type)
 
