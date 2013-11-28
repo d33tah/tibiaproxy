@@ -56,3 +56,8 @@ def ip_to_u32(ip):
     Returns int
     """
     return struct.unpack("<I", socket.inet_aton(ip))[0]
+
+def assert_equal(v1, v2):
+    if v1 != v2:
+        sys.exit("assertion error: v1[%s] != v2[%s]" % (repr(v1), repr(v2)))
+    return True

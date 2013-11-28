@@ -190,6 +190,7 @@ class Server:
                                               self.real_tibia))
 
         conn_obj = Connection(conn, xtea_key)
+        received_player = False
         while True:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
@@ -260,13 +261,41 @@ class Server:
                 msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
-                packet_type = msg.getByte()
-                if packet_type in GameProtocol.server_packet_types:
-                    if self.debug:
-                        log("S [%s] %s" % (hex(packet_type),
-                            GameProtocol.server_packet_types[packet_type]))
-                else:
-                    log("Got a packet of type %s from server" % packet_type)
+                while msg.finished():
+                    packet_type = msg.getByte()
+                    if packet_type in GameProtocol.server_packet_types:
+                        if self.debug:
+                            log("S [%s] %s" % (hex(packet_type),
+                                GameProtocol.server_packet_types[packet_type])
+                                )
+                    else:
+                        log("Got a packet of type %s from server" %
+                            packet_type)
+                    # login successful
+                    if packet_type == 0x17:
+                        msg.getU32()   # player ID
+                        msg.getU16()   # beat duration
+                        msg.getU32()   # speed A
+                        msg.getU32()   # speed B
+                        msg.getU32()   # speed C
+                        msg.getByte()  # 1 if can report bugs, 0 otherwise
+
+                        # no idea what's this:
+                        assert_equal(msg.getByte(), 0xB6)
+                        assert_equal(msg.getByte(), 0x7F)
+                        assert_equal(msg.getByte(), 0x00)
+                        assert_equal(msg.getByte(), 0x0A)
+                        assert_equal(msg.getByte(), 0x0F)
+                        assert_equal(msg.getByte(), 0x64)
+                        log("TODO")
+                        received_player = True
+                    # FYI box
+                    if packet_type == 0x15:
+                        fyi = msg.getString()
+                        log("Got a FYI: %s" % fyi)
+
+
+                log("Sending!")
 
                 conn.send(data)
 

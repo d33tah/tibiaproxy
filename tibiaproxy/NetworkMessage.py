@@ -251,3 +251,6 @@ class NetworkMessage:
         """
         self.buf[self.pos] = byte
         self.pos += 1
+
+    def finished(self):
+        return self.pos < len(self.buf)
