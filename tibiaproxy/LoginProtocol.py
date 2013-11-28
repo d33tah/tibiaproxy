@@ -21,7 +21,7 @@ LoginProtocol.py - contains code needed to handle the login protocol.
 from NetworkMessage import NetworkMessage
 import RSA
 import XTEA
-from util import *
+from util import log
 
 
 def create_login_world_entry(name, hostname, port):
