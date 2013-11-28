@@ -24,6 +24,7 @@ import importlib
 import os
 from tibiaproxy.util import log
 
+
 def main():
     """tibiaproxy's entry point."""
     plugins = []
@@ -35,16 +36,16 @@ def main():
         log("Loaded plugin %s." % plugin_name)
 
     server = Server(destination_login_host=config.destination_login_host,
-               destination_login_port=config.destination_login_port,
-               listen_login_host=config.listen_login_host,
-               listen_login_port=config.listen_login_port,
-               listen_game_host=config.listen_game_host,
-               listen_game_port=config.listen_game_port,
-               announce_host=config.announce_host,
-               announce_port=config.announce_port,
-               real_tibia=config.real_tibia,
-               debug=config.debug,
-               plugins=plugins)
+                    destination_login_port=config.destination_login_port,
+                    listen_login_host=config.listen_login_host,
+                    listen_login_port=config.listen_login_port,
+                    listen_game_host=config.listen_game_host,
+                    listen_game_port=config.listen_game_port,
+                    announce_host=config.announce_host,
+                    announce_port=config.announce_port,
+                    real_tibia=config.real_tibia,
+                    debug=config.debug,
+                    plugins=plugins)
     server.run()
 
 if __name__ == '__main__':

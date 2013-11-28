@@ -6,6 +6,7 @@ a line of Python code, with the result being sent back to the player.
 The original message does not get forwarded to the server.
 """
 
+
 def on_client_say(conn, msg):
     """If the message started with >, run it as a Python code."""
     if not msg.startswith(">"):
