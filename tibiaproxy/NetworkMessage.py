@@ -101,6 +101,9 @@ class NetworkMessage:
         self.pos += size
         return str(ret)
 
+    def getCoordinates(self):
+        return [self.getU16(), self.getU16(), self.getByte()]
+
     def skipBytes(self, _bytes):
         """Skips a number of bytes from the network message.
 

@@ -262,6 +262,32 @@ class Server:
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
                 while msg.finished():
+                    def getMapDescription():
+                        def getTile():
+                            assert_equal(msg.getByte(), 0)
+                            assert_equal(msg.getByte(), 0)
+                            log("GOT THAT FAR!!!!!!!!!!!!!!!")
+                        def getFloorDescription(x, y, z, w, h, offset, skip):
+                            for nx in range(w):
+                                for ny in range(h):
+                                    getTile()
+
+                        x, y, z = msg.getCoordinates()
+                        w = 18
+                        h = 14
+                        skip = [-1]
+                        if z > 7:
+                            startz = z - 2
+                            endz = min(16 - 1, z + 2)
+                            zstep = 1
+                        else:
+                            startz = 7
+                            endz = 0
+                            zstep = -1
+                        nz = startz
+                        while nz != endz + zstep:
+                            getFloorDescription(x, y, nz, w, h, z - nz, skip)
+                            nz += zstep
                     packet_type = msg.getByte()
                     if packet_type in GameProtocol.server_packet_types:
                         if self.debug:
@@ -287,6 +313,7 @@ class Server:
                         assert_equal(msg.getByte(), 0x0A)
                         assert_equal(msg.getByte(), 0x0F)
                         assert_equal(msg.getByte(), 0x64)
+                        getMapDescription()
                         log("TODO")
                         received_player = True
                     # FYI box
