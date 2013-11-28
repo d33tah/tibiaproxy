@@ -49,7 +49,7 @@ class U32:
         if callable(r):  # return a wrapper if integer's function was requested
             def f(*args, **kwargs):
                 if args and isinstance(args[0], U32):
-                    args = (args[0].int, ) + args[1:]
+                    args = (args[0].int_, ) + args[1:]
                 ret = r(*args, **kwargs)
                 if ret is NotImplemented:
                     return ret
