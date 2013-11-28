@@ -23,16 +23,16 @@ import socket
 import struct
 
 
-def log(_str):
+def log(value):
     """Poor man's log function. Prints the argument to the standard error
     output, with a newline added. Then, it flushes it just-in-case.
 
     Args:
-        _str (str): the message to be printed
+        value: the value to be printed
 
     Returns None
     """
-    sys.stderr.write(_str + "\n")
+    sys.stderr.write(str(value) + "\n")
     sys.stderr.flush()
 
 
