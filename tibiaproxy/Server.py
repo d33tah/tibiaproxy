@@ -22,7 +22,7 @@ import LoginProtocol
 import GameProtocol
 import XTEA
 import RSA
-from util import *
+from util import log
 
 import select
 import socket
