@@ -92,7 +92,7 @@ def int_to_buf(num):
 
     # Now, convert the hexadecimal form to a binary one.
     num_bin = ""
-    for i in range(len(num_hex)/2):
+    for i in range(int(len(num_hex)/2)):
         chunk = num_hex[i*2:(i+1)*2]
         num_bin += chr(int(chunk, 16))
 
