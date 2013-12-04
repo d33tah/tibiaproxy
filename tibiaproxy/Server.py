@@ -17,12 +17,12 @@
 #along with Foobar; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from NetworkMessage import NetworkMessage, adlerChecksum
-import LoginProtocol
-import GameProtocol
-import XTEA
-import RSA
-from util import log
+from tibiaproxy.NetworkMessage import NetworkMessage, adlerChecksum
+from tibiaproxy import LoginProtocol
+from tibiaproxy import GameProtocol
+from tibiaproxy import XTEA
+from tibiaproxy import RSA
+from tibiaproxy.util import log
 
 import select
 import socket
