@@ -194,10 +194,10 @@ class Server:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
             if conn in has_data:
-                data = ''
+                data = bytearray()
                 size_raw = conn.recv(2)
                 data += size_raw
-                if size_raw == '':
+                if size_raw == bytearray():
                     log("The client disconnected")
                     break
                 size = struct.unpack("<H", size_raw)[0]
@@ -240,10 +240,10 @@ class Server:
                     dest_s.send(data)
             if dest_s in has_data:
                 # Server sent us some data.
-                data = ''
+                data = bytearray()
                 size_raw = dest_s.recv(2)
                 data += size_raw
-                if data == '':
+                if data == bytearray():
                     conn.close()
                     log("The server disconnected")
                     break
