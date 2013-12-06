@@ -100,7 +100,7 @@ class NetworkMessage:
         size = self.getU16()
         ret = self.buf[self.pos:self.pos+size]
         self.pos += size
-        return str(ret)
+        return ret.decode('latin1')
 
     def skipBytes(self, _bytes):
         """Skips a number of bytes from the network message.
@@ -221,7 +221,7 @@ class NetworkMessage:
         Returns None
         """
         self.buf += struct.pack("<H", len(_str))
-        self.buf += _str
+        self.buf += _str.encode('latin1')
 
     def getPos(self):
         """Returns the current position in the buffer
