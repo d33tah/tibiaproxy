@@ -33,7 +33,7 @@ import sys
 import struct
 
 
-class Connection:
+class Connection(object):
     def __init__(self, conn, xtea_key):
         self.conn = conn
         self.xtea_key = xtea_key

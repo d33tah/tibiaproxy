@@ -49,7 +49,7 @@ def adlerChecksum(buf):
     return (b << 16) | a
 
 
-class NetworkMessage:
+class NetworkMessage(object):
     """A utility class used to extract structures out of network messages and
     build custom ones."""
 
