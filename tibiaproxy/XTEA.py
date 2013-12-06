@@ -21,7 +21,35 @@ XTEA encryption/decryption module.
 import struct
 
 
-class U32:
+# You might want to take a look here:
+# http://stackoverflow.com/q/20430637/1091116
+def _build_delegate(name, attr, cls):
+    def f(*args, **kwargs):
+        args = tuple(a if not isinstance(a, cls) else a.int_ for a in args)
+        ret = attr(*args, **kwargs)
+        if ret is NotImplemented:
+            return ret
+        if name in ['__str__', '__repr__', '__index__', '__hash__']:
+            return ret
+        ret %= 2**32
+        return cls(ret)
+    return f
+
+
+def delegated_special_methods(type_):
+    def decorator(cls):
+        for name, value in vars(type_).items():
+            if (name[:2], name[-2:]) != ('__', '__') or not callable(value):
+                continue
+            if hasattr(cls, name) and not name == '__repr__':
+                continue
+            setattr(cls, name, _build_delegate(name, value, cls))
+        return cls
+    return decorator
+
+
+@delegated_special_methods(int)
+class U32(object):
     """Emulates 32-bit unsigned int known from C programming language."""
 
     def __init__(self, num=0, base=None):
@@ -42,24 +70,6 @@ class U32:
     def __str__(self):
         return "<U32 instance at 0x%x, int=%d>" % (id(self), self.int_)
 
-    def __getattr__(self, attribute_name):
-        # you might want to take a look here:
-        # http://stackoverflow.com/q/19611001/1091116
-        r = getattr(self.int_, attribute_name)
-        if callable(r):  # return a wrapper if integer's function was requested
-            def f(*args, **kwargs):
-                if args and isinstance(args[0], U32):
-                    args = (args[0].int_, ) + args[1:]
-                ret = r(*args, **kwargs)
-                if ret is NotImplemented:
-                    return ret
-                if attribute_name in ['__str__', '__repr__', '__index__']:
-                    return ret
-                ret %= 2**32
-                return U32(ret)
-            return f
-        return r
-
 
 def XTEA_encrypt(buf, k):
     """Encrypts a given message using the given key.
@@ -70,7 +80,7 @@ def XTEA_encrypt(buf, k):
 
     Returns bytearray
     """
-    ret = ""
+    ret = bytearray()
     for offset in range(int(len(buf)/8)):
         v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
         v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
@@ -85,7 +95,7 @@ def XTEA_encrypt(buf, k):
                   (sum_ + U32(k[sum_ >> U32(11) & U32(3)]))
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
-    return bytearray(ret)
+    return ret
 
 
 def XTEA_decrypt(buf, k):
@@ -97,7 +107,7 @@ def XTEA_decrypt(buf, k):
 
     Returns bytearray
     """
-    ret = ""
+    ret = bytearray()
     for offset in range(int(len(buf)/8)):
         v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
         v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
