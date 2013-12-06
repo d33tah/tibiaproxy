@@ -74,6 +74,12 @@ class U32(object):
 def XTEA_encrypt(buf, k):
     """Encrypts a given message using the given key.
 
+    >>> key = [4060739823, 3225438839, 2808461571, 1241583342]
+    >>> encrypted = b\'\\xfc\\xd9\\xd8A\\x0b\\xc4~\\x82\'
+    >>> decrypted = b\'I\\x00\\x14"\\x001\\nW\'
+    >>> XTEA_encrypt(decrypted, key) == encrypted
+    True
+
     Args:
         buf (str): the data to be encrypted
         k (list): XTEA key - a list of four OpenTibia U32 integers
@@ -101,6 +107,12 @@ def XTEA_encrypt(buf, k):
 def XTEA_decrypt(buf, k):
     """Decrypts a given message using the given key.
 
+    >>> key = [4060739823, 3225438839, 2808461571, 1241583342]
+    >>> encrypted = b\'\\xfc\\xd9\\xd8A\\x0b\\xc4~\\x82\'
+    >>> decrypted = b\'I\\x00\\x14"\\x001\\nW\'
+    >>> XTEA_decrypt(encrypted, key) == decrypted
+    True
+
     Args:
         buf (str): the data to be decrypted
         k (list): XTEA key - a list of four OpenTibia U32 integers
@@ -123,3 +135,7 @@ def XTEA_decrypt(buf, k):
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
     return bytearray(ret)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
