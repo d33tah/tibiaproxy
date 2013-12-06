@@ -71,7 +71,7 @@ def XTEA_encrypt(buf, k):
     Returns bytearray
     """
     ret = ""
-    for offset in range(len(buf)/8):
+    for offset in range(int(len(buf)/8)):
         v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
         v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
         delta = U32(0x61C88647)
@@ -98,7 +98,7 @@ def XTEA_decrypt(buf, k):
     Returns bytearray
     """
     ret = ""
-    for offset in range(len(buf)/8):
+    for offset in range(int(len(buf)/8)):
         v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
         v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
         delta = U32(0x61C88647)
