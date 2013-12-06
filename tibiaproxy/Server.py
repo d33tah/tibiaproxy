@@ -159,7 +159,7 @@ class Server:
         """
 
         # send a bogus challenge = 109, timestamp = 1385139009
-        conn.send('\x0c\x00@\x02!\x07\x06\x00\x1fA\x8b\x8fRm')
+        conn.send(b'\x0c\x00@\x02!\x07\x06\x00\x1fA\x8b\x8fRm')
 
         data = conn.recv(2)
         size = struct.unpack("<H", data)[0]
