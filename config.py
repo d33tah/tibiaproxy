@@ -26,4 +26,4 @@ announce_port = listen_game_port
 
 # Whether we're in the debug mode or not. This gives you additional debug
 # messages and drops you into a debugger if an uncaught exception happens.
-debug = False
+debug = True
