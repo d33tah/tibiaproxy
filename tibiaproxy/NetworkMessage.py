@@ -18,6 +18,7 @@ custom ones.
 #along with Foobar; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+import copy
 import struct
 from tibiaproxy import XTEA
 
@@ -124,11 +125,11 @@ class NetworkMessage:
 
         Returns str
         """
-        ret = self.buf
+        ret = copy.copy(self.buf)
         # Add the padding
         size = len(ret)
         for _ in range(8 - (size) % 8):
-            ret += "%c" % 0x33
+            ret += bytearray([0x33])
 
         ret_with_size = struct.pack("<H", size) + ret
         return ret_with_size
@@ -163,7 +164,7 @@ class NetworkMessage:
 
         Returns None
         """
-        self.buf += chr(byte)
+        self.buf += bytearray([byte])
 
     def addU32(self, u32):
         """Adds an unsigned 32-bit integer to the end of the network message.
