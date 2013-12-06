@@ -19,9 +19,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
 import config
-from tibiaproxy.Server import Server
 import importlib
 import os
+
+from tibiaproxy.Server import Server
 from tibiaproxy.util import log
 
 
