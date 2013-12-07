@@ -106,7 +106,7 @@ def XTEA_encrypt(buf, k):
                 ) % 2**32
             ) % 2**32
 
-            sum_ = mod32bit(sum_ - delta)
+            sum_ = (sum_ - delta) % 2 ** 32
 
             v1 = (
                 v1
@@ -118,7 +118,7 @@ def XTEA_encrypt(buf, k):
                         ) % 2**32 + v0
                     ) % 2**32
                     ^
-                    (sum_ + k[mod32bit(sum_ >> 11) & 3]) % 2**32
+                    (sum_ + k[(sum_ >> 11) % 2**32 & 3]) % 2**32
                 ) % 2**32
             ) % 2**32
 
