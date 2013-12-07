@@ -44,6 +44,7 @@ def XTEA_encrypt(buf, k):
         sum_ = 0
 
         for _ in range(32):
+            # v0 += ((v1 << 4 ^ v1 >> 5) + v1) ^ (sum + k[sum & 3]);
             v0 = (
                 v0
                 +
@@ -58,6 +59,7 @@ def XTEA_encrypt(buf, k):
 
             sum_ = (sum_ - delta) % 2 ** 32
 
+            # v1 += ((v0 << 4 ^ v0 >> 5) + v0) ^ (sum + k[sum >> 11 & 3]);
             v1 = (
                 v1
                 +
@@ -100,6 +102,7 @@ def XTEA_decrypt(buf, k):
 
         for _ in range(32):
 
+            # v1 -= ((v0 << 4 ^ v0 >> 5) + v0) ^ (sum + k[sum >> 11 & 3]);
             v1 = (
                 v1
                 -
@@ -116,6 +119,7 @@ def XTEA_decrypt(buf, k):
 
             sum_ = (sum_ + delta) % 2**32
 
+            # v0 -= ((v1 << 4 ^ v1 >> 5) + v1) ^ (sum + k[sum & 3]);
             v0 = (
                 v0
                 -
