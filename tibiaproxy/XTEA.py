@@ -88,17 +88,39 @@ def XTEA_encrypt(buf, k):
     """
     ret = bytearray()
     for offset in range(int(len(buf)/8)):
-        v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
-        v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
-        delta = U32(0x61C88647)
-        sum_ = U32(0)
+        v0 = struct.unpack("<I", buf[offset*8:offset*8+4])[0]
+        v1 = struct.unpack("<I", buf[offset*8+4:offset*8+8])[0]
+        delta = 0x61C88647
+        sum_ = 0
 
         for _ in range(32):
-            v0 += ((v1 << U32(4) ^ v1 >> U32(5)) + v1) ^ \
-                  (sum_ + U32(k[sum_ & U32(3)]))
-            sum_ -= delta
-            v1 += ((v0 << U32(4) ^ v0 >> U32(5)) + v0) ^ \
-                  (sum_ + U32(k[sum_ >> U32(11) & U32(3)]))
+            v0 = (
+                v0
+                +
+                (
+                    (
+                        (v1 << 4) % 2**32 ^ (v1 >> 5) % 2**32
+                    ) % 2**32
+                    +
+                    v1 ^ (sum_ + k[sum_ & 3]) % 2**32
+                ) % 2**32
+            ) % 2**32
+
+            sum_ = mod32bit(sum_ - delta)
+
+            v1 = (
+                v1
+                +
+                (
+                    (
+                        (
+                            (v0 << 4) % 2**32 ^ (v0 >> 5) % 2**32
+                        ) % 2**32 + v0
+                    ) % 2**32
+                    ^
+                    (sum_ + k[mod32bit(sum_ >> 11) & 3]) % 2**32
+                ) % 2**32
+            ) % 2**32
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
     return ret
