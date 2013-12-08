@@ -18,8 +18,9 @@ custom ones.
 #along with Foobar; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+import copy
 import struct
-import XTEA
+from tibiaproxy import XTEA
 
 
 def adlerChecksum(buf):
@@ -48,7 +49,7 @@ def adlerChecksum(buf):
     return (b << 16) | a
 
 
-class NetworkMessage:
+class NetworkMessage(object):
     """A utility class used to extract structures out of network messages and
     build custom ones."""
 
@@ -99,7 +100,7 @@ class NetworkMessage:
         size = self.getU16()
         ret = self.buf[self.pos:self.pos+size]
         self.pos += size
-        return str(ret)
+        return ret.decode('latin1')
 
     def getCoordinates(self):
         return [self.getU16(), self.getU16(), self.getByte()]
@@ -127,11 +128,11 @@ class NetworkMessage:
 
         Returns str
         """
-        ret = self.buf
+        ret = copy.copy(self.buf)
         # Add the padding
         size = len(ret)
         for _ in range(8 - (size) % 8):
-            ret += "%c" % 0x33
+            ret += bytearray([0x33])
 
         ret_with_size = struct.pack("<H", size) + ret
         return ret_with_size
@@ -166,7 +167,7 @@ class NetworkMessage:
 
         Returns None
         """
-        self.buf += chr(byte)
+        self.buf += bytearray([byte])
 
     def addU32(self, u32):
         """Adds an unsigned 32-bit integer to the end of the network message.
@@ -223,7 +224,7 @@ class NetworkMessage:
         Returns None
         """
         self.buf += struct.pack("<H", len(_str))
-        self.buf += _str
+        self.buf += _str.encode('latin1')
 
     def getPos(self):
         """Returns the current position in the buffer

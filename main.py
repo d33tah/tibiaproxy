@@ -18,10 +18,12 @@ along with Foobar; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 """
 
+import sys
 import config
-from tibiaproxy.Server import Server
 import importlib
 import os
+
+from tibiaproxy.Server import Server
 from tibiaproxy.util import log
 
 
@@ -48,5 +50,26 @@ def main():
                     plugins=plugins)
     server.run()
 
+
+def run_pdb_hook(*args, **kwargs):
+    """Debug mode exception handler. Drops into a debugger shell"""
+
+    import traceback
+
+    # load ipdb if possible, otherwise fall back to pdb
+    try:
+        import ipdb as pdb
+    except ImportError:
+        import pdb
+
+    # if it's a KeyboardInterrupt, ignore it and just tell it and quit.
+    if isinstance(args[1], KeyboardInterrupt):
+        sys.exit("Caught a KeyboardInterrupt, quitting.")
+
+    traceback.print_exception(*args, **kwargs)
+    pdb.pm()
+
 if __name__ == '__main__':
+    if config.debug:
+        sys.excepthook = run_pdb_hook
     main()

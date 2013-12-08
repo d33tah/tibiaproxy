@@ -17,12 +17,12 @@
 #along with Foobar; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from NetworkMessage import NetworkMessage, adlerChecksum
-import LoginProtocol
-import GameProtocol
-import XTEA
-import RSA
-from util import *
+from tibiaproxy.NetworkMessage import NetworkMessage, adlerChecksum
+from tibiaproxy import LoginProtocol
+from tibiaproxy import GameProtocol
+from tibiaproxy import XTEA
+from tibiaproxy import RSA
+from tibiaproxy.util import log
 
 import select
 import socket
@@ -33,7 +33,10 @@ import sys
 import struct
 
 
-class Connection:
+class Connection(object):
+    """Exposes an interface that allows the plugins to perform protocol
+    operations"""
+
     def __init__(self, conn, xtea_key):
         self.conn = conn
         self.xtea_key = xtea_key
@@ -159,7 +162,7 @@ class Server:
         """
 
         # send a bogus challenge = 109, timestamp = 1385139009
-        conn.send('\x0c\x00@\x02!\x07\x06\x00\x1fA\x8b\x8fRm')
+        conn.send(b'\x0c\x00@\x02!\x07\x06\x00\x1fA\x8b\x8fRm')
 
         data = conn.recv(2)
         size = struct.unpack("<H", data)[0]
@@ -195,10 +198,10 @@ class Server:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
             if conn in has_data:
-                data = ''
+                data = bytearray()
                 size_raw = conn.recv(2)
                 data += size_raw
-                if size_raw == '':
+                if size_raw == bytearray():
                     log("The client disconnected")
                     break
                 size = struct.unpack("<H", size_raw)[0]
@@ -241,10 +244,10 @@ class Server:
                     dest_s.send(data)
             if dest_s in has_data:
                 # Server sent us some data.
-                data = ''
+                data = bytearray()
                 size_raw = dest_s.recv(2)
                 data += size_raw
-                if data == '':
+                if data == bytearray():
                     conn.close()
                     log("The server disconnected")
                     break

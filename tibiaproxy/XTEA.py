@@ -21,48 +21,14 @@ XTEA encryption/decryption module.
 import struct
 
 
-class U32:
-    """Emulates 32-bit unsigned int known from C programming language."""
-
-    def __init__(self, num=0, base=None):
-        """Creates the U32 object.
-
-        Args:
-            num: the integer/string to use as the initial state
-            base: the base of the integer use if the num given was a string
-        """
-        if base is None:
-            self.int_ = int(num) % 2**32
-        else:
-            self.int_ = int(num, base) % 2**32
-
-    def __coerce__(self, ignored):
-        return None
-
-    def __str__(self):
-        return "<U32 instance at 0x%x, int=%d>" % (id(self), self.int_)
-
-    def __getattr__(self, attribute_name):
-        # you might want to take a look here:
-        # http://stackoverflow.com/q/19611001/1091116
-        r = getattr(self.int_, attribute_name)
-        if callable(r):  # return a wrapper if integer's function was requested
-            def f(*args, **kwargs):
-                if args and isinstance(args[0], U32):
-                    args = (args[0].int_, ) + args[1:]
-                ret = r(*args, **kwargs)
-                if ret is NotImplemented:
-                    return ret
-                if attribute_name in ['__str__', '__repr__', '__index__']:
-                    return ret
-                ret %= 2**32
-                return U32(ret)
-            return f
-        return r
-
-
 def XTEA_encrypt(buf, k):
     """Encrypts a given message using the given key.
+
+    >>> key = [4060739823, 3225438839, 2808461571, 1241583342]
+    >>> encrypted = b\'\\xfc\\xd9\\xd8A\\x0b\\xc4~\\x82\'
+    >>> decrypted = b\'I\\x00\\x14"\\x001\\nW\'
+    >>> XTEA_encrypt(decrypted, key) == encrypted
+    True
 
     Args:
         buf (str): the data to be encrypted
@@ -70,26 +36,35 @@ def XTEA_encrypt(buf, k):
 
     Returns bytearray
     """
-    ret = ""
-    for offset in range(len(buf)/8):
-        v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
-        v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
-        delta = U32(0x61C88647)
-        sum_ = U32(0)
+    ret = bytearray()
+    for offset in range(int(len(buf)/8)):
+        v0 = struct.unpack("<I", buf[offset*8:offset*8+4])[0]
+        v1 = struct.unpack("<I", buf[offset*8+4:offset*8+8])[0]
+        delta = 0x9E3779B9L
+        sum_ = 0
 
         for _ in range(32):
-            v0 += ((v1 << U32(4) ^ v1 >> U32(5)) + v1) ^ \
-                  (sum_ + U32(k[sum_ & U32(3)]))
-            sum_ -= delta
-            v1 += ((v0 << U32(4) ^ v0 >> U32(5)) + v0) ^ \
-                  (sum_ + U32(k[sum_ >> U32(11) & U32(3)]))
+
+            v0 += ((v1<<4 ^ v1>>5) + v1) ^ (sum_ + k[sum_ & 3])
+            v0 &= 0xFFFFFFFFL
+
+            sum_ = (sum_ + delta) & 0xFFFFFFFFL
+
+            v1 += ((v0<<4 ^ v0>>5) + v0) ^ (sum_ + k[sum_>>11 & 3])
+            v1 &= 0xFFFFFFFFL
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
-    return bytearray(ret)
+    return ret
 
 
 def XTEA_decrypt(buf, k):
     """Decrypts a given message using the given key.
+
+    >>> key = [4060739823, 3225438839, 2808461571, 1241583342]
+    >>> encrypted = b\'\\xfc\\xd9\\xd8A\\x0b\\xc4~\\x82\'
+    >>> decrypted = b\'I\\x00\\x14"\\x001\\nW\'
+    >>> XTEA_decrypt(encrypted, key) == decrypted
+    True
 
     Args:
         buf (str): the data to be decrypted
@@ -97,19 +72,26 @@ def XTEA_decrypt(buf, k):
 
     Returns bytearray
     """
-    ret = ""
-    for offset in range(len(buf)/8):
-        v0 = U32(struct.unpack("<I", buf[offset*8:offset*8+4])[0])
-        v1 = U32(struct.unpack("<I", buf[offset*8+4:offset*8+8])[0])
-        delta = U32(0x61C88647)
-        sum_ = U32(0xC6EF3720)
+    ret = bytearray()
+    for offset in range(int(len(buf)/8)):
+        v0 = struct.unpack("<I", buf[offset*8:offset*8+4])[0]
+        v1 = struct.unpack("<I", buf[offset*8+4:offset*8+8])[0]
+        delta = 0x9E3779B9L
+        sum_  = 0xC6EF3720
 
         for _ in range(32):
-            v1 -= ((v0 << U32(4) ^ v0 >> U32(5)) + v0) ^ \
-                  (sum_ + U32(k[sum_ >> U32(11) & U32(3)]))
-            sum_ += delta
-            v0 -= ((v1 << U32(4) ^ v1 >> U32(5)) + v1) ^ \
-                  (sum_ + U32(k[sum_ & U32(3)]))
+
+            v1 -= ((v0<<4 ^ v0>>5) + v0) ^ (sum_ + k[sum_>>11 & 3])
+            v1 &= 0xFFFFFFFFL
+
+            sum_ = (sum_ - delta) & 0xFFFFFFFFL
+
+            v0 -= ((v1<<4 ^ v1>>5) + v1) ^ (sum_ + k[sum_ & 3])
+            v0 &= 0xFFFFFFFFL
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
     return bytearray(ret)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

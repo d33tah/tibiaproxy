@@ -18,6 +18,8 @@ Pure-python RSA implementation, along with OpenTibia and Tibia keys.
 #along with Foobar; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
+import sys
+
 
 def toint(x):
     """Convert a string represented as an integer to an integer, removing all
@@ -91,10 +93,17 @@ def int_to_buf(num):
         num_hex = "0" + num_hex
 
     # Now, convert the hexadecimal form to a binary one.
-    num_bin = ""
-    for i in range(len(num_hex)/2):
+
+    if sys.version < '3':
+        chr_to_buf_f = bytearray
+    else:
+        chr_to_buf_f = bytes
+
+    num_bin = chr_to_buf_f()
+
+    for i in range(int(len(num_hex)/2)):
         chunk = num_hex[i*2:(i+1)*2]
-        num_bin += chr(int(chunk, 16))
+        num_bin += chr_to_buf_f([int(chunk, 16)])
 
     return num_bin
 
@@ -110,7 +119,7 @@ def RSA_decrypt(c_bin, n=otserv_n):
     c = buf_to_int(c_bin)
     # z = c^d % n. pow(c,d,n) is way faster than z = c**d % n.
     z = pow(c, d, n)
-    return bytearray(int_to_buf(z))
+    return int_to_buf(z)
 
 
 def RSA_encrypt(m_bin, n=tibia_n, e=65537):
@@ -126,4 +135,4 @@ def RSA_encrypt(m_bin, n=tibia_n, e=65537):
     # return c = m^e mod n
     m = buf_to_int(m_bin)
     c = pow(m, e, n)
-    return bytearray(int_to_buf(c))
+    return int_to_buf(c)

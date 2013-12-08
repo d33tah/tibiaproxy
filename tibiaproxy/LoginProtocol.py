@@ -18,10 +18,10 @@ LoginProtocol.py - contains code needed to handle the login protocol.
 #along with Foobar; if not, write to the Free Software
 #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from NetworkMessage import NetworkMessage
-import RSA
-import XTEA
-from util import log
+from tibiaproxy.NetworkMessage import NetworkMessage
+from tibiaproxy import RSA
+from tibiaproxy import XTEA
+from tibiaproxy.util import log
 
 
 def create_login_world_entry(name, hostname, port):

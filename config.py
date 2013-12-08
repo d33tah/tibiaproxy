@@ -24,5 +24,6 @@ listen_game_port = int(listen_login_port) - 1
 announce_host = listen_login_host
 announce_port = listen_game_port
 
-# Whether we're in the debug mode or not.
-debug = False
+# Whether we're in the debug mode or not. This gives you additional debug
+# messages and drops you into a debugger if an uncaught exception happens.
+debug = True

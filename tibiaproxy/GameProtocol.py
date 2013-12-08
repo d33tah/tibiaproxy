@@ -18,8 +18,8 @@ GameProtocol.py - contains code needed to handle the game protocol.
 # along with Foobar; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-from NetworkMessage import NetworkMessage, adlerChecksum
-import RSA
+from tibiaproxy.NetworkMessage import NetworkMessage, adlerChecksum
+from tibiaproxy import RSA
 import struct
 
 
