@@ -34,6 +34,9 @@ import struct
 
 
 class Connection(object):
+    """Exposes an interface that allows the plugins to perform protocol
+    operations"""
+
     def __init__(self, conn, xtea_key):
         self.conn = conn
         self.xtea_key = xtea_key
