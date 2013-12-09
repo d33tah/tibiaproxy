@@ -22,7 +22,7 @@ from tibiaproxy import LoginProtocol
 from tibiaproxy import GameProtocol
 from tibiaproxy import XTEA
 from tibiaproxy import RSA
-from tibiaproxy.util import log
+from tibiaproxy.util import log, assert_equal
 
 import select
 import socket
