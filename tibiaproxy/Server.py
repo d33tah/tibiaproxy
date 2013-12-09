@@ -267,9 +267,27 @@ class Server:
                 while msg.finished():
                     def getMapDescription():
                         def getTile():
-                            assert_equal(msg.getByte(), 0)
-                            assert_equal(msg.getByte(), 0)
-                            log("GOT THAT FAR!!!!!!!!!!!!!!!")
+                            got_effect = False
+                            for stackPos in range(256):
+                                if msg.peekU16()  >= 0xff00:
+                                    return msg.getU16() & 0xff
+                                if not got_effect:
+                                    msg.getU16()
+                                    got_effect = True
+                                    continue
+                                assert(stackPos <= 10)
+                                thingId = msg.getU16()
+                                log(thingId)
+                                assert(thingId != 0)
+                                if thingId == 96:
+                                    log("strange... got a staticText")
+                                elif thingId in [97, 98, 99]:
+                                    # it's a creature
+                                    pass
+                                else:
+                                    # it's a thing - might require reading 3
+                                    # extra bytes
+                                    pass
                         def getFloorDescription(x, y, z, w, h, offset, skip):
                             for nx in range(w):
                                 for ny in range(h):

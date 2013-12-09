@@ -158,6 +158,9 @@ class NetworkMessage(object):
         """
         return self.buf
 
+    def peekU16(self):
+        return struct.unpack("<H", self.buf[self.pos:self.pos+2])[0]
+
     def addByte(self, byte):
         """Adds a unsigned 8-bit integer to the end of the network message.
 
