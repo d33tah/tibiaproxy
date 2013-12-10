@@ -62,7 +62,7 @@ def parseReply(msg, xtea_key):
     """
     size = msg.getU16()
 
-    # someday perhaps I'll have enough time to even check the checksums!
+    # TODO: someday perhaps I'll have enough time to even check the checksums!
     msg.skipBytes(4)
 
     msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
