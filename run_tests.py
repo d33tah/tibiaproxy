@@ -40,7 +40,7 @@ def request_game():
     s.recv(ord(size))
 
     s.send(open("test/game.bin").read())
-    time.sleep(0.1)
+    time.sleep(0.2)
     s.close()
 
 threading.Thread(target=reply_with_charlist, args=(l_s,)).start()
