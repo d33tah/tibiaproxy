@@ -40,13 +40,13 @@ def request_game():
     s.recv(ord(size))
 
     s.send(open("test/game.bin").read())
-    time.sleep(3.0)
+    time.sleep(0.1)
     s.close()
 
 threading.Thread(target=reply_with_charlist, args=(l_s,)).start()
 threading.Thread(target=reply_with_game, args=(g_s,)).start()
-threading.Timer(1.0, request_charlist).start()
-threading.Timer(2.0, request_game).start()
+threading.Timer(0.1, request_charlist).start()
+threading.Timer(0.2, request_game).start()
 
 main.tibiaproxy_main({
     'announce_host': '127.0.0.1',
