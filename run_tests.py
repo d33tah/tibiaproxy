@@ -16,19 +16,19 @@ g_s.bind(("127.0.0.1", 7169))
 def reply_with_charlist(l_s):
     l_s.listen(1)
     s, _ = l_s.accept()
-    s.send(open("test/login-response.bin").read())
+    s.send(open("test/login-response.bin", "rb").read())
     s.close()
 
 def reply_with_game(g_s):
     g_s.listen(1)
     s, _ = g_s.accept()
-    s.send(open("test/game-response.bin").read())
+    s.send(open("test/game-response.bin", "rb").read())
     s.close()
 
 def request_charlist():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(("127.0.0.1", 7171))
-    s.send(open("test/login.bin").read())
+    s.send(open("test/login.bin", "rb").read())
     s.close()
 
 def request_game():
@@ -39,7 +39,7 @@ def request_game():
     assert(s.recv(1) == '\x00')
     s.recv(ord(size))
 
-    s.send(open("test/game.bin").read())
+    s.send(open("test/game.bin", "rb").read())
     time.sleep(0.2)
     s.close()
 
