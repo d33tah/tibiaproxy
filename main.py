@@ -72,4 +72,4 @@ def run_pdb_hook(*args, **kwargs):
 if __name__ == '__main__':
     if imported_config.debug:
         sys.excepthook = run_pdb_hook
-    main(imported_config.__dict__)
+    tibiaproxy_main(imported_config.__dict__)
