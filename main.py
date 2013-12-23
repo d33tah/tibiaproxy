@@ -27,7 +27,7 @@ from tibiaproxy.Server import Server
 from tibiaproxy.util import log
 
 
-def main(config):
+def tibiaproxy_main(config):
     """tibiaproxy's entry point."""
     plugins = []
     for filename in os.listdir('plugins'):
