@@ -251,7 +251,7 @@ class Server:
                     log("The server disconnected")
                     break
                 size = struct.unpack("<H", size_raw)[0]
-                data += dest_s.recv(size+4)
+                data += dest_s.recv(size)
                 msg = NetworkMessage(data)
                 msg_size = msg.getU16()
                 msg.getU32()  # skip the checksum validation
