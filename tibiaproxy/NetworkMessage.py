@@ -79,7 +79,7 @@ class NetworkMessage(object):
 
         Returns int
         """
-        u32 = struct.unpack("<I", self.buf[self.pos:self.pos+4])[0]
+        u32 = struct.unpack("<I", bytes(self.buf[self.pos:self.pos+4]))[0]
         self.pos += 4
         return u32
 
@@ -88,7 +88,7 @@ class NetworkMessage(object):
 
         Returns int
         """
-        u16 = struct.unpack("<H", self.buf[self.pos:self.pos+2])[0]
+        u16 = struct.unpack("<H", bytes(self.buf[self.pos:self.pos+2]))[0]
         self.pos += 2
         return u16
 
@@ -159,7 +159,7 @@ class NetworkMessage(object):
         return self.buf
 
     def peekU16(self):
-        return struct.unpack("<H", self.buf[self.pos:self.pos+2])[0]
+        return struct.unpack("<H", bytes(self.buf[self.pos:self.pos+2]))[0]
 
     def addByte(self, byte):
         """Adds a unsigned 8-bit integer to the end of the network message.

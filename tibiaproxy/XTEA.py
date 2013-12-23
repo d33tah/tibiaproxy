@@ -38,8 +38,8 @@ def XTEA_encrypt(buf, k):
     """
     ret = bytearray()
     for offset in range(int(len(buf)/8)):
-        v0 = struct.unpack("<I", buf[offset*8:offset*8+4])[0]
-        v1 = struct.unpack("<I", buf[offset*8+4:offset*8+8])[0]
+        v0 = struct.unpack("<I", bytes(buf[offset*8:offset*8+4]))[0]
+        v1 = struct.unpack("<I", bytes(buf[offset*8+4:offset*8+8]))[0]
         delta = 0x9E3779B9
         sum_ = 0
 
@@ -74,8 +74,8 @@ def XTEA_decrypt(buf, k):
     """
     ret = bytearray()
     for offset in range(int(len(buf)/8)):
-        v0 = struct.unpack("<I", buf[offset*8:offset*8+4])[0]
-        v1 = struct.unpack("<I", buf[offset*8+4:offset*8+8])[0]
+        v0 = struct.unpack("<I", bytes(buf[offset*8:offset*8+4]))[0]
+        v1 = struct.unpack("<I", bytes(buf[offset*8+4:offset*8+8]))[0]
         delta = 0x9E3779B9
         sum_  = 0xC6EF3720
 
