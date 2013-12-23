@@ -40,18 +40,18 @@ def XTEA_encrypt(buf, k):
     for offset in range(int(len(buf)/8)):
         v0 = struct.unpack("<I", buf[offset*8:offset*8+4])[0]
         v1 = struct.unpack("<I", buf[offset*8+4:offset*8+8])[0]
-        delta = 0x9E3779B9L
+        delta = 0x9E3779B9
         sum_ = 0
 
         for _ in range(32):
 
             v0 += ((v1<<4 ^ v1>>5) + v1) ^ (sum_ + k[sum_ & 3])
-            v0 &= 0xFFFFFFFFL
+            v0 &= 0xFFFFFFFF
 
-            sum_ = (sum_ + delta) & 0xFFFFFFFFL
+            sum_ = (sum_ + delta) & 0xFFFFFFFF
 
             v1 += ((v0<<4 ^ v0>>5) + v0) ^ (sum_ + k[sum_>>11 & 3])
-            v1 &= 0xFFFFFFFFL
+            v1 &= 0xFFFFFFFF
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
     return ret
@@ -76,18 +76,18 @@ def XTEA_decrypt(buf, k):
     for offset in range(int(len(buf)/8)):
         v0 = struct.unpack("<I", buf[offset*8:offset*8+4])[0]
         v1 = struct.unpack("<I", buf[offset*8+4:offset*8+8])[0]
-        delta = 0x9E3779B9L
+        delta = 0x9E3779B9
         sum_  = 0xC6EF3720
 
         for _ in range(32):
 
             v1 -= ((v0<<4 ^ v0>>5) + v0) ^ (sum_ + k[sum_>>11 & 3])
-            v1 &= 0xFFFFFFFFL
+            v1 &= 0xFFFFFFFF
 
-            sum_ = (sum_ - delta) & 0xFFFFFFFFL
+            sum_ = (sum_ - delta) & 0xFFFFFFFF
 
             v0 -= ((v1<<4 ^ v1>>5) + v1) ^ (sum_ + k[sum_ & 3])
-            v0 &= 0xFFFFFFFFL
+            v0 &= 0xFFFFFFFF
 
         ret += struct.pack("<I", v0) + struct.pack("<I", v1)
     return bytearray(ret)
