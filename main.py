@@ -29,6 +29,10 @@ from tibiaproxy.util import log
 
 def tibiaproxy_main(config):
     """tibiaproxy's entry point."""
+
+    if config['debug']:
+        sys.excepthook = run_pdb_hook
+
     plugins = []
     for filename in os.listdir('plugins'):
         if filename == "__init__.py" or filename[-3:] != ".py":
@@ -70,6 +74,4 @@ def run_pdb_hook(*args, **kwargs):
     pdb.pm()
 
 if __name__ == '__main__':
-    if imported_config.debug:
-        sys.excepthook = run_pdb_hook
     tibiaproxy_main(imported_config.__dict__)
