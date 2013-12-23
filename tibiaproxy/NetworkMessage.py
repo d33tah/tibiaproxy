@@ -102,6 +102,9 @@ class NetworkMessage(object):
         self.pos += size
         return ret.decode('latin1')
 
+    def getCoordinates(self):
+        return [self.getU16(), self.getU16(), self.getByte()]
+
     def skipBytes(self, _bytes):
         """Skips a number of bytes from the network message.
 
@@ -154,6 +157,9 @@ class NetworkMessage(object):
         Returns str
         """
         return self.buf
+
+    def peekU16(self):
+        return struct.unpack("<H", self.buf[self.pos:self.pos+2])[0]
 
     def addByte(self, byte):
         """Adds a unsigned 8-bit integer to the end of the network message.
@@ -252,3 +258,6 @@ class NetworkMessage(object):
         """
         self.buf[self.pos] = byte
         self.pos += 1
+
+    def finished(self):
+        return self.pos < len(self.buf)

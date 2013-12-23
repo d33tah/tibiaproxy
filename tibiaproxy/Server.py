@@ -22,7 +22,7 @@ from tibiaproxy import LoginProtocol
 from tibiaproxy import GameProtocol
 from tibiaproxy import XTEA
 from tibiaproxy import RSA
-from tibiaproxy.util import log
+from tibiaproxy.util import log, assert_equal
 
 import select
 import socket
@@ -193,6 +193,7 @@ class Server:
                                               self.real_tibia))
 
         conn_obj = Connection(conn, xtea_key)
+        received_player = False
         while True:
             # Wait until either the player or the server sent some data.
             has_data, _, _ = select.select([conn, dest_s], [], [])
@@ -263,13 +264,86 @@ class Server:
                 msg_buf = XTEA.XTEA_decrypt(msg.getRest(), xtea_key)
                 msg = NetworkMessage(msg_buf)
                 msg.getU16()
-                packet_type = msg.getByte()
-                if packet_type in GameProtocol.server_packet_types:
-                    if self.debug:
-                        log("S [%s] %s" % (hex(packet_type),
-                            GameProtocol.server_packet_types[packet_type]))
-                else:
-                    log("Got a packet of type %s from server" % packet_type)
+                while msg.finished():
+                    def getMapDescription():
+                        def getTile():
+                            got_effect = False
+                            for stackPos in range(256):
+                                if msg.peekU16()  >= 0xff00:
+                                    return msg.getU16() & 0xff
+                                if not got_effect:
+                                    msg.getU16()
+                                    got_effect = True
+                                    continue
+                                assert(stackPos <= 10)
+                                thingId = msg.getU16()
+                                log(thingId)
+                                assert(thingId != 0)
+                                if thingId == 96:
+                                    log("strange... got a staticText")
+                                elif thingId in [97, 98, 99]:
+                                    # it's a creature
+                                    pass
+                                else:
+                                    # it's a thing - might require reading 3
+                                    # extra bytes
+                                    pass
+                        def getFloorDescription(x, y, z, w, h, offset, skip):
+                            for nx in range(w):
+                                for ny in range(h):
+                                    getTile()
+
+                        x, y, z = msg.getCoordinates()
+                        w = 18
+                        h = 14
+                        skip = [-1]
+                        if z > 7:
+                            startz = z - 2
+                            endz = min(16 - 1, z + 2)
+                            zstep = 1
+                        else:
+                            startz = 7
+                            endz = 0
+                            zstep = -1
+                        nz = startz
+                        while nz != endz + zstep:
+                            getFloorDescription(x, y, nz, w, h, z - nz, skip)
+                            nz += zstep
+                    packet_type = msg.getByte()
+                    if packet_type in GameProtocol.server_packet_types:
+                        if self.debug:
+                            log("S [%s] %s" % (hex(packet_type),
+                                GameProtocol.server_packet_types[packet_type])
+                                )
+                    else:
+                        log("Got a packet of type %s from server" %
+                            packet_type)
+                    # login successful
+                    if packet_type == 0x17:
+                        msg.getU32()   # player ID
+                        msg.getU16()   # beat duration
+                        msg.getU32()   # speed A
+                        msg.getU32()   # speed B
+                        msg.getU32()   # speed C
+                        msg.getByte()  # 1 if can report bugs, 0 otherwise
+
+                        # no idea what's this:
+                        assert_equal(msg.getByte(), 0xB6)
+                        assert_equal(msg.getByte(), 0x7F)
+                        assert_equal(msg.getByte(), 0x00)
+                        assert_equal(msg.getByte(), 0x0A)
+                        assert_equal(msg.getByte(), 0x0F)
+                        assert_equal(msg.getByte(), 0x64)
+                        getMapDescription()
+                        log("TODO")
+                        received_player = True
+                    # FYI box
+                    if packet_type == 0x15:
+                        fyi = msg.getString()
+                        log("Got a FYI: %s" % fyi)
+
+
+                log("Sending!")
 
                 conn.send(data)
 
