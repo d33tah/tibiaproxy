@@ -181,7 +181,7 @@ class Server:
         size_raw = dest_s.recv(2)
         size = struct.unpack("<H", size_raw)[0]
         checksum = dest_s.recv(4)
-        data = dest_s.recv(size)
+        data = dest_s.recv(size - 4)
         msg = NetworkMessage(data)
 
         challenge_data = GameProtocol.parseChallengeMessage(msg)
