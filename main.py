@@ -19,7 +19,7 @@
 #Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 import sys
-import config
+import config as imported_config
 import importlib
 import os
 
@@ -27,7 +27,7 @@ from tibiaproxy.Server import Server
 from tibiaproxy.util import log
 
 
-def main():
+def main(config):
     """tibiaproxy's entry point."""
     plugins = []
     for filename in os.listdir('plugins'):
@@ -37,16 +37,16 @@ def main():
         plugins += [importlib.import_module('plugins.' + plugin_name)]
         log("Loaded plugin %s." % plugin_name)
 
-    server = Server(destination_login_host=config.destination_login_host,
-                    destination_login_port=config.destination_login_port,
-                    listen_login_host=config.listen_login_host,
-                    listen_login_port=config.listen_login_port,
-                    listen_game_host=config.listen_game_host,
-                    listen_game_port=config.listen_game_port,
-                    announce_host=config.announce_host,
-                    announce_port=config.announce_port,
-                    real_tibia=config.real_tibia,
-                    debug=config.debug,
+    server = Server(destination_login_host=config['destination_login_host'],
+                    destination_login_port=config['destination_login_port'],
+                    listen_login_host=config['listen_login_host'],
+                    listen_login_port=config['listen_login_port'],
+                    listen_game_host=config['listen_game_host'],
+                    listen_game_port=config['listen_game_port'],
+                    announce_host=config['announce_host'],
+                    announce_port=config['announce_port'],
+                    real_tibia=config['real_tibia'],
+                    debug=config['debug'],
                     plugins=plugins)
     server.run()
 
@@ -70,6 +70,6 @@ def run_pdb_hook(*args, **kwargs):
     pdb.pm()
 
 if __name__ == '__main__':
-    if config.debug:
+    if imported_config.debug:
         sys.excepthook = run_pdb_hook
-    main()
+    main(imported_config.__dict__)
