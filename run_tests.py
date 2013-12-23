@@ -36,7 +36,7 @@ def request_game():
     s.connect(("127.0.0.1", 7170))
 
     size = s.recv(1)
-    assert(s.recv(1) == '\x00')
+    assert(s.recv(1) == b'\x00')
     s.recv(ord(size))
 
     s.send(open("test/game.bin", "rb").read())
