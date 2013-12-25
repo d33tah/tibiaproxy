@@ -1,5 +1,14 @@
 #!/usr/bin/python
 
+"""
+Usage:
+
+./run_tests.py
+
+Runs the tibiaproxy in debug mode, connects to it and simulates the Tibia
+server.
+"""
+
 import main
 import socket
 import threading
