@@ -77,6 +77,7 @@ lagging under Windows.
 TO-DO list
 ==========
 
+* test whether the proxy still works under 10.31
 * clean up the code, add the missing documentation
 * investigate the Windows lagging problem
 * investigate why sometimes the server message has incorrect length
