@@ -71,7 +71,7 @@ Bugs, problems
 ==============
 
 Currently, only a small fraction of the Tibia protocol is implemented and none
-of the features are guaranteed to work. Also, I received reports about bot
+of the features are guaranteed to work. Also, I received a report about bot
 lagging under Windows.
 
 TO-DO list
