@@ -269,7 +269,7 @@ class Server:
                         def getTile():
                             got_effect = False
                             for stackPos in range(256):
-                                if msg.peekU16()  >= 0xff00:
+                                if msg.peekU16() >= 0xff00:
                                     return msg.getU16() & 0xff
                                 if not got_effect:
                                     msg.getU16()
@@ -288,6 +288,7 @@ class Server:
                                     # it's a thing - might require reading 3
                                     # extra bytes
                                     pass
+
                         def getFloorDescription(x, y, z, w, h, offset, skip):
                             for nx in range(w):
                                 for ny in range(h):
@@ -341,7 +342,6 @@ class Server:
                     if packet_type == 0x15:
                         fyi = msg.getString()
                         log("Got a FYI: %s" % fyi)
-
 
                 log("Sending!")
 
