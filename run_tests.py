@@ -22,11 +22,13 @@ g_s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 g_s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 g_s.bind(("127.0.0.1", 7169))
 
+
 def reply_with_charlist(l_s):
     l_s.listen(1)
     s, _ = l_s.accept()
     s.send(open("test/login-response.bin", "rb").read())
     s.close()
+
 
 def reply_with_game(g_s):
     g_s.listen(1)
@@ -34,11 +36,13 @@ def reply_with_game(g_s):
     s.send(open("test/game-response.bin", "rb").read())
     s.close()
 
+
 def request_charlist():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect(("127.0.0.1", 7171))
     s.send(open("test/login.bin", "rb").read())
     s.close()
+
 
 def request_game():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
