@@ -47,6 +47,7 @@ ThingLastAttr = 255
 
 NumCategories = 4
 
+
 def load_item(f):
     done = False
     while True:
@@ -92,15 +93,17 @@ def load_item(f):
     numPatternY = ord(f.read(1))
     numPatternZ = ord(f.read(1))
     animationPhases = ord(f.read(1))
-    totalSprites = area * layers * numPatternX * numPatternY * numPatternZ * animationPhases
+    totalSprites = (area * layers * numPatternX * numPatternY * numPatternZ
+                    * animationPhases)
     assert(totalSprites <= 4096)
     for i in range(totalSprites):
         f.read(4)
 
+
 def load_items(filename="Tibia.dat"):
     f = open("Tibia.dat")
-    f.read(4) # skip the checksum
-    numItems = [ None for i in range(NumCategories) ]
+    f.read(4)  # skip the checksum
+    numItems = [None for i in range(NumCategories)]
     items = {}
     for i in range(NumCategories):
         numItems[i] = struct.unpack("<H", f.read(2))[0] + 1
