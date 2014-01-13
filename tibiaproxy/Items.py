@@ -114,6 +114,8 @@ def load_items(filename="Tibia.dat"):
             firstId += 100
         for itemId in range(firstId, lastId):
             items[itemId] = load_item(f)
+    return items
 
 if __name__ == "__main__":
-    load_items()
+    # we're saving the value for python -i testing.
+    items = load_items()
