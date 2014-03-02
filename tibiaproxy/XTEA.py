@@ -93,5 +93,29 @@ def XTEA_decrypt(buf, k):
     return bytearray(ret)
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    import sys
+    if len(sys.argv) <= 1:
+        import doctest
+        doctest.testmod()
+        sys.exit()
+
+    # Switch stdout to binary mode so that Python 3 doesn't complain
+    import os
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'wb', 0)
+
+    buf = bytearray(open(sys.argv[1], "rb").read())
+    offset = int(sys.argv[2])
+
+    # Note to self: to convert hexdump to an XTEA key, do:
+    # binary = [chr(int(x,16)) for x in sys.argv[3].replace("  ", " ").split()]
+    # [ struct.unpack("<I", ''.join(binary)[i*4:(i+1)*4])[0] for i in range(4)]
+    k = [int(i) for i in sys.argv[3:]]
+
+    d = XTEA_decrypt(buf[offset:], k)
+    if d[2] == 0x14:
+        sys.stdout.write(d)
+    else:
+        for offset in range(len(buf)):
+            d = XTEA_decrypt(buf[offset:], k)
+            if d[2] == 0x14:
+                sys.exit("Try offset=%d" % offset)
