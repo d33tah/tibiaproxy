@@ -136,3 +136,29 @@ def RSA_encrypt(m_bin, n=tibia_n, e=65537):
     m = buf_to_int(m_bin)
     c = pow(m, e, n)
     return int_to_buf(c)
+
+if __name__ == "__main__":
+
+    if len(sys.argv) <= 1:
+        sys.exit("Usage: RSA.py <filename> <optional offset>")
+
+    # Switch stdout to binary mode so that Python 3 doesn't complain
+    import os
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'wb', 0)
+
+    buf = bytearray(open(sys.argv[1], "rb").read())
+    offset = 23
+    if len(sys.argv) > 2:
+        offset = int(sys.argv[2])
+    decrypted = RSA_decrypt(buf[offset:offset+128])
+
+    if decrypted[1] != 0:
+        # Try to guess the offset.
+        for offset in range(len(buf)):
+            decrypted = RSA_decrypt(buf[offset:offset+128])
+            sys.stderr.write("Trying %d.\n" % offset)
+            if decrypted[1] == 0:
+                sys.stderr.write("Try %d.\n" % offset)
+                break
+    else:
+        sys.stdout.write(decrypted)
