@@ -152,12 +152,13 @@ if __name__ == "__main__":
         offset = int(sys.argv[2])
     decrypted = RSA_decrypt(buf[offset:offset+128])
 
-    if decrypted[1] != 0:
-        # Try to guess the offset.
+    if decrypted[17] != 0:
+        # Try to guess the offset. 17th byte is the second byte of
+        # account name size.
         for offset in range(len(buf)):
             decrypted = RSA_decrypt(buf[offset:offset+128])
             sys.stderr.write("Trying %d.\n" % offset)
-            if decrypted[1] == 0:
+            if decrypted[17] == 0:
                 sys.stderr.write("Try %d.\n" % offset)
                 break
     else:
