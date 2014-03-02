@@ -147,8 +147,7 @@ if __name__ == "__main__":
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'wb', 0)
 
     buf = bytearray(open(sys.argv[1], "rb").read())
-    # Actually, the offset might be wrong. I was testing it on a 9.3 packet.
-    offset = 23
+    offset = 28
     if len(sys.argv) > 2:
         offset = int(sys.argv[2])
     decrypted = RSA_decrypt(buf[offset:offset+128])
