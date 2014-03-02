@@ -129,6 +129,7 @@ class Server:
         if reply is None:
             # The reply doesn't seem to contain character list - just forward
             # it.
+            log("WARNING: Passing through the login request.")
             conn.send(data)
             conn.close()
             return
