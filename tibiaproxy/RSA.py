@@ -22,7 +22,7 @@ import sys
 
 
 def toint(x):
-    """Convert a string represented as an integer to an integer, removing all
+    """Convert an integer represented a string to an integer, removing all
     newline characters.
 
     Args:
